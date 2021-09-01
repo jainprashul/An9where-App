@@ -9,6 +9,7 @@ import Favorites from './screens/Favorites';
 import AnimeDetail from './screens/AnimeDetail';
 import Home from './screens/Home';
 import Episode from './screens/Episode';
+import Genre from './screens/Genre';
  
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,7 @@ export default function App() {
           }} component={Home} />
         <Stack.Screen name="Favorites" component={Favorites} />
         <Stack.Screen name="AnimeDetail" component={AnimeDetail} />
+        <Stack.Screen name="Genre" component={Genre} />
         <Stack.Screen name="Episode" component={Episode} options={{
           headerShown : false,
         }} />

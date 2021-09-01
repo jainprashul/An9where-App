@@ -2,17 +2,19 @@ import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { ButtonGroup } from 'react-native-elements/dist/buttons/ButtonGroup';
 import Player from '../components/Player';
 import VideoPlayer from '../components/VideoPlayer';
 import { API } from '../helpers/Const';
 
 const Episode = ({ route, navigation }) => {
 
-  const { episodes, id, title } = route.params ;
+  const { episodes, id, title } = route.params;
 
   const [link, setLink] = useState('')
   const [episodeNo, setEpisodeNo] = useState('episode-1')
   const [error, setError] = useState('')
+  const [voiceType, setVoiceType] = useState(0) // 0:DUB 1:SUB
   const getEpisodes = () => {
     const query = [
       fetch(API.iframe(id, episodeNo)),
@@ -38,9 +40,9 @@ const Episode = ({ route, navigation }) => {
 
         let vLink = dub.servers[1] ? dub.servers[1]['iframe'] : (sub.servers[1] ? sub.servers[1]["iframe"] : '')
         setLink(vLink)
-        
+
       }).catch((error) => {
-        console.error("Error : " ,error);
+        console.error("Error : ", error);
       });
 
 
@@ -57,15 +59,23 @@ const Episode = ({ route, navigation }) => {
   return (
     <View>
       <View style={styles.playerBox}>
-      {/* {link.length ? <Player link={link} /> : null} */}
+        {/* {link.length ? <Player link={link} /> : null} */}
 
       </View>
-      <View style={styles.container}></View>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.episode}>Episode {episodeNo.split('-')[1]}</Text> 
+      <View style={styles.container}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.episode}>Episode {episodeNo.split('-')[1]}</Text>
+        <ButtonGroup buttons={["DUB", "SUB"]} onPress={(index) => setVoiceType(index)} selectedIndex={voiceType}
+        containerStyle={{ borderRadius: 10, backgroundColor: '#fff', borderColor: '#fff' }}
+        selectedButtonStyle={{backgroundColor: '#3399FF'}}
+        />
+
+        
+      </View>
+
       {/* {error} */}
 
-      
+
     </View>
   );
 }
@@ -74,6 +84,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    padding: 10,
     // alignItems: 'center',
     // justifyContent: 'center',
   },

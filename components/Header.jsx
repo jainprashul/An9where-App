@@ -5,7 +5,9 @@ import { Icon } from 'react-native-elements'
 const Header = ({title}) => {
     return (
         <View style={styles.header}>
+            <Icon name='menu' style={styles.menu} type='feather' color='#3399FF' />
             <Text style={styles.headerTitle}>{title}</Text>
+            
         </View>
     )
 }    
@@ -17,7 +19,7 @@ const styles = StyleSheet.create({
         height: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center'
+        // justifyContent: 'center'
     },
     headerLogo: {  
         flex: 1,
@@ -30,6 +32,12 @@ const styles = StyleSheet.create({
         color: '#3399FF',
         letterSpacing: 1,
     },
+    menu: {
+        fontSize: 30,
+        // marginLeft: 10,
+        marginRight: 15,
+        
+    }
 })
 
 export default Header

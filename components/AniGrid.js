@@ -7,13 +7,14 @@ import { ActivityIndicator } from 'react-native';
 import { FlatList, StyleSheet } from 'react-native';
 import { Card, Button, Text, Icon } from 'react-native-elements'
 import { ScreenHeight, ScreenWidth } from 'react-native-elements/dist/helpers';
+import Loading from './Loading';
 
 
 const AniCard = ({anime}) => {
     let { img, title, id } = anime;
     const navigation = useNavigation();
     return (
-        <TouchableOpacity onPress={() => { navigation.navigate('AnimeDetail', anime)}}>
+        <TouchableOpacity onPress={() => { navigation.push('AnimeDetail', anime)}}>
             <Card containerStyle={styles.container}>
                 <Card.Title>{title}</Card.Title>
                 {/* <Card.Divider /> */}
@@ -24,14 +25,14 @@ const AniCard = ({anime}) => {
     )
 }
 
-const CardHeader = () => {
+const CardHeader = (title) => {
     return (
-        <Button title='Popular' disabled disabledStyle={styles.header} disabledTitleStyle={{color: '#fff'}}  buttonStyle={styles.header}>
+        <Button title={title} disabled disabledStyle={styles.header} disabledTitleStyle={{color: '#fff'}}  buttonStyle={styles.header}>
         </Button>
     )
 }
 
-const AniGrid = ({ data }) => {
+const AniGrid = ({ data , title }) => {
 
     if (data.length > 0) {
         return (
@@ -40,15 +41,13 @@ const AniGrid = ({ data }) => {
                 renderItem={({ item }) => <AniCard anime={item} />}
                 keyExtractor={(item, index) => item.id}
                 numColumns={2}
-                ListHeaderComponent={CardHeader}
+                ListHeaderComponent={CardHeader(title)}
             />
         )
 
     } else {
         return (
-            <ActivityIndicator size='large' style={{
-                marginTop: 10,
-            }} />
+            <Loading />
         )
     }
 };
@@ -69,8 +68,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderColor: '#ccc',
         borderWidth: 1,
-        borderRadius: 5,
-        width: ScreenWidth - 10,
+        // borderRadius: 5,
+        width: ScreenWidth,
         backgroundColor: '#3399FF',
         // tintColor: '#fff',
 

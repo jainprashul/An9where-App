@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Button, Image } from 'react-native'
+import { StyleSheet, View, Button, Image, ScrollView } from 'react-native'
 import { Card, Divider, Text } from 'react-native-elements'
 import { Chip } from 'react-native-elements'
 import { ScreenWidth } from 'react-native-elements/dist/helpers'
@@ -9,16 +9,20 @@ const AnimeDetail = ({route, navigation}) => {
   const {id, title, synopsis, img, genres, status, otherName, released, totalEpisodes, episodes} = route.params
 
 //   console.log(img);
+console.log(ScreenWidth);
+
 
   navigation.setOptions({
     headerTitle: title
   })
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Card>
-          <Image source={{ uri: img }} style={styles.image} />
-          <Button title="Watch Now" onPress={() => navigation.navigate('Episode', {id, title, episodes})}/>
+      <Image source={{uri: img}} style={styles.poster}/>
+
+          <Button title="Watch Now" onPress={() => navigation.navigate('Episode', {id, title, episodes})}/>         
+          
           <Divider orientation='horizontal'  />
           <Text h3 style={styles.title}>{title}</Text>
           <Text h4 style={styles.altTitle}>{otherName}</Text>
@@ -27,7 +31,7 @@ const AnimeDetail = ({route, navigation}) => {
               genres.map((item, index) => {
                   return (
                     <View key={index} style={styles.chip}>
-                        <Chip type='outline' title={item} />
+                        <Chip type='outline' title={item} onPress={()=>{navigation.navigate('Genre', {genre : item})}} />
                     </View>
                   )})
           }
@@ -45,11 +49,10 @@ const AnimeDetail = ({route, navigation}) => {
           
 
       </Card>
-    </View>
+    </ScrollView>
     )
 }
 
-console.log(ScreenWidth);
 
 const styles = StyleSheet.create({
 
@@ -69,13 +72,13 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginVertical: 10,
     },
-    image: {
-        flex: 1,
+    poster: {
         width: ScreenWidth * 0.85,
         height: 300,
         resizeMode: 'cover'
     },
     altTitle: {
+        color: '#777',
     },
     chipBox: {
         // flex : 1,
