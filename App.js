@@ -10,6 +10,7 @@ import AnimeDetail from './screens/AnimeDetail';
 import Home from './screens/Home';
 import Episode from './screens/Episode';
 import Genre from './screens/Genre';
+import Search from './components/Search';
  
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,9 @@ export default function App() {
         <Stack.Screen name="AnimeDetail" component={AnimeDetail} />
         <Stack.Screen name="Genre" component={Genre} />
         <Stack.Screen name="Episode" component={Episode} options={{
+          headerShown : false,
+        }} />
+        <Stack.Screen name="Search" component={Search} options={{
           headerShown : false,
         }} />
         {/* <Stack.Screen name="NotFound" component={() => <Text>Not Found</Text>} /> */}

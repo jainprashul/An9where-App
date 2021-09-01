@@ -7,23 +7,21 @@ const Favorites = ({route}) => {
     
     return (
     <View style={styles.container}>
-        <Text>Favorites</Text>
+        <Text>You don't have any favorites yet</Text>
         {/* <Text >{title}</Text>
         <Text>{description}</Text>
         <Image source={{uri: image}} style={styles.image} /> */}
-        <Button style={styles.button} title='Btn' onPress={() => {    
-            console.log('button pressed')
-        }}/>
+
     </View>
     )
 } 
 
 const styles = StyleSheet.create({ 
     container: {
+        marginTop: 50,
         flex: 1,
-        justifyContent: 'center',
+        // justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F5FCFF',
     },
     welcome: {
         fontSize: 20,

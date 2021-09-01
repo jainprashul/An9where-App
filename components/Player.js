@@ -143,7 +143,6 @@ const styles = StyleSheet.create({
     video: {
         width: ScreenWidth ,
         height: ScreenWidth * 0.5625,
-        marginTop: StatusBar.currentHeight
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,

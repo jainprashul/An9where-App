@@ -14,7 +14,7 @@ const Loading = () => {
 
 const styles = StyleSheet.create({
     lottie: {
-        marginVertical: ScreenHeight / 2 - 50,
+        // marginVertical:  50\\,
         width: 200,
         height: 200
     },

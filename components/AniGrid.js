@@ -25,31 +25,32 @@ const AniCard = ({anime}) => {
     )
 }
 
-const CardHeader = (title) => {
+const CardHeader = ({title}) => {
     return (
         <Button title={title} disabled disabledStyle={styles.header} disabledTitleStyle={{color: '#fff'}}  buttonStyle={styles.header}>
         </Button>
     )
 }
 
-const AniGrid = ({ data , title }) => {
+const AniGrid = ({ data , title, horizontal=false }) => {
 
-    if (data.length > 0) {
+    let col = horizontal ? null : 2;
         return (
+            <>
+            <CardHeader title={title} />
             <FlatList
                 data={data}
                 renderItem={({ item }) => <AniCard anime={item} />}
                 keyExtractor={(item, index) => item.id}
-                numColumns={2}
-                ListHeaderComponent={CardHeader(title)}
+                // ListHeaderComponent={() => }
+                ListEmptyComponent = {() => <Loading />}
+                horizontal = {horizontal}
+                numColumns={col}
             />
+            </>
         )
 
-    } else {
-        return (
-            <Loading />
-        )
-    }
+
 };
 
 
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         // backgroundColor: '#F5FCFF',
-        width: ScreenWidth/2 - 10,
+        width: ScreenWidth/2 - 10, 
         marginHorizontal : 5
     },
     header: {

@@ -1,8 +1,9 @@
 import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { StatusBar } from 'react-native';
 import { StyleSheet, Text, View } from 'react-native';
-import { ButtonGroup } from 'react-native-elements/dist/buttons/ButtonGroup';
+import { ButtonGroup } from 'react-native-elements';
 import Player from '../components/Player';
 import VideoPlayer from '../components/VideoPlayer';
 import { API } from '../helpers/Const';
@@ -13,8 +14,8 @@ const Episode = ({ route, navigation }) => {
 
   const [link, setLink] = useState('')
   const [episodeNo, setEpisodeNo] = useState('episode-1')
-  const [error, setError] = useState('')
-  const [voiceType, setVoiceType] = useState(0) // 0:DUB 1:SUB
+  const [error, setError] = useState(<Text></Text>)
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const getEpisodes = () => {
     const query = [
       fetch(API.iframe(id, episodeNo)),
@@ -63,17 +64,23 @@ const Episode = ({ route, navigation }) => {
 
       </View>
       <View style={styles.container}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.episode}>Episode {episodeNo.split('-')[1]}</Text>
-        <ButtonGroup buttons={["DUB", "SUB"]} onPress={(index) => setVoiceType(index)} selectedIndex={voiceType}
-        containerStyle={{ borderRadius: 10, backgroundColor: '#fff', borderColor: '#fff' }}
-        selectedButtonStyle={{backgroundColor: '#3399FF'}}
+        <ButtonGroup
+          onPress={(index) =>{
+            setSelectedIndex(index);
+            console.log(index);
+          }}
+          selectedIndex={selectedIndex}
+          buttons={["DUB", "SUB"]}
+          containerStyle={{ borderRadius: 10, backgroundColor: '#fff', borderColor: '#fff' }}
+          selectedButtonStyle={{ backgroundColor: '#3399FF' }}
         />
+                <Text style={styles.title}>{title}</Text>
+        <Text style={styles.episode}>Episode {episodeNo.split('-')[1]}</Text>
 
         
       </View>
 
-      {/* {error} */}
+      {error}
 
 
     </View>
@@ -83,10 +90,8 @@ const Episode = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     padding: 10,
-    // alignItems: 'center',
-    // justifyContent: 'center',
+    marginTop: StatusBar.currentHeight
   },
   title: {
     fontSize: 20,

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { StyleSheet, View, Button, Image, ScrollView } from 'react-native'
 import { Card, Divider, Text } from 'react-native-elements'
 import { Chip } from 'react-native-elements'
@@ -11,10 +11,11 @@ const AnimeDetail = ({route, navigation}) => {
 //   console.log(img);
 console.log(ScreenWidth);
 
-
-  navigation.setOptions({
-    headerTitle: title
-  })
+    useEffect(() => {
+        navigation.setOptions({
+            headerTitle: title
+          })
+    }, [title])
 
   return (
     <ScrollView style={styles.container}>
