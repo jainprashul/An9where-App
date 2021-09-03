@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList } from 'react-native';
+import { FlatList, Image, TouchableOpacity, TouchableOpacityBase, VirtualizedList } from 'react-native';
 import { ScrollView } from 'react-native';
 import { StyleSheet, View, Text, Button } from 'react-native'
 import { Icon } from 'react-native-elements';
+import { ScreenWidth } from 'react-native-elements/dist/helpers';
+import Carousel from 'react-native-snap-carousel';
 import AniGrid from '../components/AniGrid';
+import Banner from '../components/Banner';
 import Loading from '../components/Loading';
 import { API } from '../helpers/Const';
 import { getFromApi } from '../helpers/hooks';
+import LocalStorage from '../helpers/LocalStorage';
 
 const Home = ({ navigation }) => {
 
@@ -14,44 +18,37 @@ const Home = ({ navigation }) => {
   const [Ongoing, setOngoing] = useState([]);
   const [NewSeasons, setNewSeasons] = useState([]);
   const [Recent, setRecent] = useState([]);
-  const [Banner, setBanner] = useState([]);
+  const [BannerData, setBanner] = useState([]);
 
 
-  const fetchData = () => {
-
-    let query = [
-      fetch(API.popular),
-      fetch(API.ongoing),
-      fetch(API.newSeasons(1)),
-    ]
-    console.log(query);
-    Promise.all(query).then((responses) => (
-      // Get a JSON object from each of the responses
-      Promise.all(responses.map((response) => (response.json()))))).then((data) => {
-        console.log(data);
-        setPopular(data[0]);
-        setOngoing(data[1]);
-        setNewSeasons(data[2]);
-        setBanner(data[2].slice(0, 7));
-        console.log('fetched');
-      }).catch((error) => {
-        console.error(error);
-        console.log('ReFetching Now');
-        fetchData();
-      });
-  }
 
   const getAnime = () => {
+    LocalStorage.getMultipleObjects(['Popular', 'Ongoing', 'NewSeasons', 'Recent']).then((data) => {
+      setPopular(data[0]);
+      setOngoing(data[1]);
+      setNewSeasons(data[2]);
+      setRecent(data[3]);
+      setBanner(data[2].slice(0, 7));
+      console.log('Loaded from Cache');
+    }).catch((error) => {
+      console.log(error);
+    });
+
     getFromApi(API.popular).then((movies) => {
+      LocalStorage.setObject('Popular', movies);
       setPopular(movies);
     });
     getFromApi(API.ongoing).then((movies) => {
+      LocalStorage.setObject('Ongoing', movies);
       setOngoing(movies);
     });
     getFromApi(API.newSeasons(1)).then((movies) => {
+      LocalStorage.setObject('NewSeasons', movies);
       setNewSeasons(movies);
+      setBanner(movies.slice(0, 7));
     });
     getFromApi(API.recent_eps).then((movies) => {
+      LocalStorage.setObject('Recent', movies);
       setRecent(movies);
     });
     
@@ -63,39 +60,16 @@ const Home = ({ navigation }) => {
   }, []);
 
   return (
-    <ScrollView style={styles.home}>
+    <ScrollView>
       {/* <Button title="Go to Favorites" onPress={} />  */}
-      <Carousel data={Banner} />
+
+      <Banner data={BannerData} navigation={navigation} />
       <AniGrid data={Popular} title={"Popular Anime"} horizontal />
       <AniGrid data={Ongoing} title={"Ongoing Anime"} horizontal />
       <AniGrid data={NewSeasons} title={"New Seasons"} horizontal />
       <AniGrid data={Recent} title={"Recently Added Episodes"}  />
     </ScrollView>
   )
-}
-
-const styles = StyleSheet.create({
-  home: {
-    // padding: 10
-  }
-})
-
-function Carousel({data}) {
-  return (
-    <FlatList
-      data={data}
-      // style={{ flex: 1 }}
-      renderItem={({ item }) => (
-        <View style={styles.carousel}>
-          <Text style={styles.carouselText}>{item.title}</Text>
-          <Text style={styles.carouselText}>{item.description}</Text>
-        </View>
-      )}
-      pagingEnabled
-      horizontal
-      showsHorizontalScrollIndicator={false}
-    />
-  );
 }
 
 export default Home

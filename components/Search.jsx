@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { FlatList, StatusBar } from 'react-native'
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
-import { Avatar, Icon, Overlay, SearchBar } from 'react-native-elements'
+import { StyleSheet, View } from 'react-native'
+import { Avatar, SearchBar } from 'react-native-elements'
 import { ListItem } from 'react-native-elements'
 import { API } from '../helpers/Const'
 import { getFromApi } from '../helpers/hooks'
@@ -27,9 +27,14 @@ const Search = ({ navigation }) => {
         }
     }
 
+
     useEffect(() => {
         search(query)
         ref.current.focus()
+        return () => {
+            // cleanup
+            setResults([])
+        }
     }, [query])
 
     const SearchList = () => {
@@ -61,6 +66,8 @@ const Search = ({ navigation }) => {
                 placeholder="Type Here..."
                 onChangeText={(text) => setQuery(text)}
                 value={query}
+                round={true}
+                lightTheme={true}
             />
 
             <SearchList />

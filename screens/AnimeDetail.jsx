@@ -9,7 +9,7 @@ const AnimeDetail = ({route, navigation}) => {
   const {id, title, synopsis, img, genres, status, otherName, released, totalEpisodes, episodes} = route.params
 
 //   console.log(img);
-console.log(ScreenWidth);
+// console.log(ScreenWidth);
 
     useEffect(() => {
         navigation.setOptions({

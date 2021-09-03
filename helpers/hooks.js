@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Storage from "./Storage";
+import Storage from "./LocalStorage";
 
 // Hook
 export function useStorage(key, initialValue) {

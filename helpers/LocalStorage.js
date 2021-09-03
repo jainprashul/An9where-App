@@ -117,7 +117,7 @@ const removeMultipleValues = async (keys) => {
 }   // removeMultipleValues
 
 
-const Storage = {
+const LocalStorage = {
     getValue,
     getObject,
     setValue,
@@ -132,5 +132,5 @@ const Storage = {
     removeMultipleValues
 }
 
-export default Storage
+export default LocalStorage
 

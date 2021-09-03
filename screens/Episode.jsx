@@ -11,7 +11,8 @@ import { API } from '../helpers/Const';
 const Episode = ({ route, navigation }) => {
 
   const { episodes, id, title } = route.params;
-
+  let totalEpisodes = episodes.length;
+  const [videoLink, setVideoLink] = useState({});
   const [link, setLink] = useState('')
   const [episodeNo, setEpisodeNo] = useState('episode-1')
   const [error, setError] = useState(<Text></Text>)
@@ -34,12 +35,14 @@ const Episode = ({ route, navigation }) => {
           <Text>The Requested page does not exist</Text>
         </View>));
 
-        let videoFrames = {
-          subs: sub.servers[1] ? sub.frame : null,
-          dubs: dub.servers[1] ? dub.frame : null,
+        let videoLinks = {
+          sub: sub.servers[1] ? sub.servers[1]["iframe"] : null,
+          dub: dub.servers[1] ? dub.servers[1]['iframe'] : null,
         }
+        setVideoLink(videoLinks)
+      
 
-        let vLink = dub.servers[1] ? dub.servers[1]['iframe'] : (sub.servers[1] ? sub.servers[1]["iframe"] : '')
+        let vLink = dub.servers[1] ? dub.servers[1]['iframe'] : (sub.servers[1] ? sub.servers[1]["iframe"] : null)
         setLink(vLink)
 
       }).catch((error) => {
@@ -54,7 +57,13 @@ const Episode = ({ route, navigation }) => {
       title: `Episode ${episodeNo.split('-')[1]} - ${title}`
     })
     getEpisodes();
-  }, [])
+
+    console.log(episodes , videoLink);
+    return () => {
+      console.log('unmounting');
+      setVideoLink({});
+    }
+  }, [episodeNo])
 
 
   return (
@@ -65,19 +74,42 @@ const Episode = ({ route, navigation }) => {
       </View>
       <View style={styles.container}>
         <ButtonGroup
-          onPress={(index) =>{
+          onPress={(index) => {
             setSelectedIndex(index);
-            console.log(index);
+            (index === 0)? setLink(videoLink.dub) : setLink(videoLink.sub)
+            console.log(index, videoLink);
           }}
           selectedIndex={selectedIndex}
           buttons={["DUB", "SUB"]}
-          containerStyle={{ borderRadius: 10, backgroundColor: '#fff', borderColor: '#fff' }}
+          containerStyle={{ borderRadius: 10, height: 50, width: '100%' }}
           selectedButtonStyle={{ backgroundColor: '#3399FF' }}
         />
-                <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title}>{title}</Text>
         <Text style={styles.episode}>Episode {episodeNo.split('-')[1]}</Text>
 
-        
+
+        <View style={styles.chipBox}>
+          {/* {
+            episodes.map((item, index) => {
+              return (
+                
+              )
+            })
+          } */}
+
+          <View  style={styles.chip}>
+                  <Chip type='outline' title={'EPS'} onPress={() => {
+                    // let ep = 'episode-' + (index + 1)
+                    // setEpisodeNo(ep);
+                    // getEpisodes();
+                    
+                  }} />
+                </View>
+
+
+        </View>
+
+
       </View>
 
       {error}
@@ -107,6 +139,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     // color: 'red',
+  },
+  chipBox: {
+    // flex : 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginVertical: 10,
+  },
+  chip: {
+    margin: 2,
   },
 });
 export default Episode
