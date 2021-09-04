@@ -11,7 +11,7 @@ const Header = ({title}) => {
     return (
         <View style={styles.header}>
             <View style={styles.headerLeft}>
-                <Icon name='menu' style={styles.menu} type='feather' color='#3399FF' />
+                {/* <Icon name='menu' style={styles.menu} type='feather' color='#3399FF' /> */}
             <Text style={styles.headerTitle}>{title}</Text>
             </View>
             <View style={styles.headerRight}>

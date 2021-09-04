@@ -2,8 +2,6 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react'
 import { Image } from 'react-native';
 import { TouchableOpacity } from 'react-native';
-import { View } from 'react-native';
-import { ActivityIndicator } from 'react-native';
 import { FlatList, StyleSheet } from 'react-native';
 import { Card, Button, Text, Icon } from 'react-native-elements'
 import { ScreenHeight, ScreenWidth } from 'react-native-elements/dist/helpers';
