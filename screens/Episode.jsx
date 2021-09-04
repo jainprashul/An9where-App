@@ -8,10 +8,11 @@ import Player from '../components/Player';
 import VideoPlayer from '../components/VideoPlayer';
 import { API } from '../helpers/Const'
 import LocalStorage from '../helpers/LocalStorage';
-
+import Loading from '../components/Loading';
+import { ScreenWidth } from 'react-native-elements/dist/helpers';
 
 const Episode = ({ route, navigation }) => {
-  const {currentPlaying , anime, playedEpisodes} = route.params;
+  const { currentPlaying, anime, playedEpisodes = [] } = route.params;
   const { episodes, id, title, synopsis, img, totalEpisodes } = anime;
 
   // let totalEpisodes = episodes.length;
@@ -51,17 +52,16 @@ const Episode = ({ route, navigation }) => {
       });
   }
 
-  console.log(playedEpisodes);
-
+  // console.log(playedEpisodes);
   const savingEpisode = (player) => {
-    let played = playedEpisodes.push(episodeNo);
+    playedEpisodes.includes(episodeNo) ? null : playedEpisodes.push(episodeNo);
     let state = {
       currentPlaying: episodeNo,
       name: title,
       img,
       id,
       totalEpisodes,
-      playedEpisodes: played
+      playedEpisodes
     }
 
     if (player) {
@@ -71,21 +71,20 @@ const Episode = ({ route, navigation }) => {
         img,
         id,
         totalEpisodes,
-        playedEpisodes: played,
+        playedEpisodes,
         currentTime: player.currentTime,
         progress: (player.currentTime / player.duration) * 100,
       }
-      }
-      
-      LocalStorage.getObject('watching').then((data) => {
-        // let watchList = data ? data : {};
-        let watchList = {};
-        watchList[id] = state;
-        LocalStorage.setObject('watching', watchList);
-      })
-      !player && console.log('Saving', state);
     }
 
+    LocalStorage.getObject('watching').then((data) => {
+      // let watchList = data ? data : {};
+      let watchList = {};
+      watchList[id] = state;
+      LocalStorage.setObject('watching', watchList);
+    })
+    !player && console.log('Saving', state);
+  }
 
   useEffect(() => {
     navigation.setOptions({
@@ -99,12 +98,12 @@ const Episode = ({ route, navigation }) => {
   }, [episodeNo])
 
   console.log(episodeNo, videoLink);
-  console.log(playedEpisodes);
+  // console.log(playedEpisodes);
 
   return (
     <ScrollView>
       <View style={styles.playerBox}>
-        {/* {link.length ? <Player link={link} /> : null} */}
+        {link.length ? <VideoPlayer link={link} /> : <Loading />}
       </View>
       <View style={styles.container}>
         <View style={styles.playerDash}>
@@ -133,17 +132,19 @@ const Episode = ({ route, navigation }) => {
         <Text style={styles.episode}>Episode {episodeNo}</Text>
         <Text style={styles.description}>{synopsis}</Text>
         <View style={styles.chipBox}>
-          { episodes.map((item, index) => {
-              const isPlayed = playedEpisodes.includes(index + 1);
-              return (
-                  <View style={styles.chip}>
-                    <Chip type='outline' title={'EP-' + (index + 1)} color={ isPlayed ? '#3399FF' : '#fff'} onPress={() => {
-                      let ep = (index + 1)
-                      setEpisodeNo(ep);
-                      // getEpisodes();
-                    }} />
-                  </View>
-              )})}
+          {episodes.map((item, index) => {
+            const isPlayed = playedEpisodes.includes((index + 1));
+            // console.log(isPlayed, index + 1);
+            return (
+              <View key={index} style={styles.chip}>
+                <Chip type='outline' title={'EP-' + (index + 1)} buttonStyle={isPlayed ? styles.played : styles.unplayed} titleStyle={isPlayed ? styles.played : styles.unplayed} onPress={() => {
+                  let ep = (index + 1)
+                  setEpisodeNo(ep);
+                  // getEpisodes();
+                }} />
+              </View>
+            )
+          })}
         </View>
       </View>
       {error}
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    marginTop: StatusBar.currentHeight
+    // marginTop: StatusBar.currentHeight
   },
   title: {
     fontSize: 20,
@@ -185,11 +186,20 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    width: ScreenWidth,
+    height: ScreenWidth * 0.5625,
+    backgroundColor: '#000',
+    // marginTop: StatusBar.currentHeight
   },
   episode: {
     // fontSize: 15,
     // fontWeight: 'bold',
     // marginVertical: 10,
+  },
+  played: {
+    // backgroundColor: '#000',
+    borderColor: '#666',
+    color: '#666',
   },
   playerDash: {
     flexDirection: 'row',
