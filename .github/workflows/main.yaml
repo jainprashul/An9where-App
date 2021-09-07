@@ -11,14 +11,11 @@ jobs:
         with:
           node-version: 14.x
       - name: expo
-        uses: expo/expo-github-actions@v6
+        uses: expo/expo-github-action@v6
         with:
-          token: ${{ secrets.EXPO_TOKEN }}
           expo-version: 4.x
+          token: ${{ secrets.EXPO_TOKEN }}
       - name: install dependencies
-        run: npm install
+        run: yarn install
       - name: build android
         run: expo build:android -t apk
-
-
-
