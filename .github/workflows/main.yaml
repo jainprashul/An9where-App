@@ -14,10 +14,10 @@ jobs:
         uses: expo/expo-github-action@v6
         with:
           expo-version: 4.x
-          token: ${{ secrets.EXPO_TOKEN }
-          expo-cache: true
+          token: ${{ secrets.EXPO_TOKEN }}
+          username: ${{ secrets.EXPO_USERNAME }}
+          password: ${{ secrets.EXPO_PASSWORD }}
       - name: install dependencies
         run: yarn install
       - name: build android
         run: expo build:android -t apk
-      
