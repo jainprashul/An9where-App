@@ -17,6 +17,8 @@ const Episode = ({ route, navigation }) => {
 
   // let totalEpisodes = episodes.length;
   const [videoLink, setVideoLink] = useState({});
+  const [videosQuality, setVideosQuality] = useState({});
+  const [videoQ , setVideoQ] = useState({});
   const [link, setLink] = useState('')
   const [episodeNo, setEpisodeNo] = useState(currentPlaying);
   const [error, setError] = useState(<Text></Text>)
@@ -39,13 +41,23 @@ const Episode = ({ route, navigation }) => {
           <Text>The Requested page does not exist</Text>
         </View>));
 
+        let videosQualityDict = {
+          sub: sub.videos,
+          dub: dub.videos,
+        }
+        console.log(videosQualityDict);
+        setVideosQuality(videosQualityDict);
+
         let videoLinks = {
           sub: sub.servers[1] ? sub.servers[1]["iframe"] : null,
           dub: dub.servers[1] ? dub.servers[1]['iframe'] : null,
         }
         setVideoLink(videoLinks)
+
         let vLink = dub.servers[1] ? dub.servers[1]['iframe'] : (sub.servers[1] ? sub.servers[1]["iframe"] : null)
         setLink(vLink)
+        let videoQ = dub.servers[1] ? dub.videos : sub.videos
+        setVideoQ(videoQ)
         savingEpisode();
       }).catch((error) => {
         console.error("Error : ", error);
@@ -92,8 +104,9 @@ const Episode = ({ route, navigation }) => {
     })
     getEpisodes();
     return () => {
-      console.log('unmounting');
       setVideoLink({});
+      setLink('');
+      console.log('Unmounting EPS');
     }
   }, [episodeNo])
 
@@ -103,7 +116,7 @@ const Episode = ({ route, navigation }) => {
   return (
     <ScrollView>
       <View style={styles.playerBox}>
-        {link.length ? <VideoPlayer link={link} /> : <Loading />}
+        {link.length ? <VideoPlayer link={link} videoQ={videoQ} /> : <Loading />}
       </View>
       <View style={styles.container}>
         <View style={styles.playerDash}>
@@ -120,7 +133,16 @@ const Episode = ({ route, navigation }) => {
         {videoLink.dub ? <ButtonGroup
           onPress={(index) => {
             setSelectedIndex(index);
-            (index === 0) ? setLink(videoLink.dub) : setLink(videoLink.sub)
+            if (index === 0) {
+              setLink(videoLink.dub);
+              setVideoQ(videosQuality.dub);
+              
+            } else {
+              setLink(videoLink.sub);
+              setVideoQ(videosQuality.sub);
+            }
+            // (index === 0) ? setLink(videoLink.dub) : setLink(videoLink.sub)
+            // (index === 0) ? setVideosQuality(videosQuality.dub) : setVideosQuality(videosQuality.sub)
             console.log(index, videoLink);
           }}
           selectedIndex={selectedIndex}

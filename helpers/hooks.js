@@ -46,7 +46,8 @@ export function getFromApi(api_url) {
         return json;
       })
       .catch((error) => {
-        console.error(error);
+          console.error(error);
+          alert("Error: " + error);
         // rerun if failed to fetch
         getFromApi(api_url);
       });

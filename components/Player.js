@@ -111,11 +111,6 @@ const Player = ({ link }) => {
                     <Icon name="forward" style={styles.icon}  onPress={forward} /> */}
 
                     <View style={styles.sliderContainer}>
-                        
-                        <View style={styles.timer}>
-                            <Text style={styles.timerText}>{getTime(status.positionMillis)}</Text>
-                            <Text style={styles.timerText}>{getTime(status.durationMillis)}</Text>
-                        </View>
                         <Slider
                             style={styles.slider}
                             value={status.positionMillis / status.durationMillis}

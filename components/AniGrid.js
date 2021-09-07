@@ -12,7 +12,10 @@ const AniCard = ({anime}) => {
     let { img, title, id } = anime;
     const navigation = useNavigation();
     return (
-        <TouchableOpacity onPress={() => { navigation.push('AnimeDetail', anime)}}>
+        <TouchableOpacity onPress={() => {
+            navigation.push('AnimeDetail', anime);
+            console.log(anime);
+        }}>
             <Card containerStyle={styles.container}>
                 <Card.Title>{title}</Card.Title>
                 {/* <Card.Divider /> */}
