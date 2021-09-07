@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "aniwatch",
+    "name": "An9where",
     "slug": "aniwatch",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -23,7 +23,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.aniwatch.AniWatch",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
