@@ -11,7 +11,7 @@ jobs:
         with:
           node-version: 14.x
       - name: expo
-      - uses: expo/expo-github-action@v6
+        uses: expo/expo-github-action@v6
         with:
           token: ${{ secrets.EXPO_TOKEN }}
           username: ${{ secrets.EXPO_USERNAME }}
