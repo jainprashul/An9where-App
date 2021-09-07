@@ -11,7 +11,7 @@ jobs:
         with:
           node-version: 14.x
       - name: expo
-        uses: expo/expo-github-action@3.0.0
+        uses: expo/expo-github-action@5.1.1
         with:
           token: ${{ secrets.EXPO_TOKEN }}
       - name: install dependencies
