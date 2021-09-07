@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "An9where",
+    "name": "An9where - Watch Free Anime",
     "slug": "aniwatch",
     "version": "1.0.1",
     "orientation": "portrait",
@@ -24,8 +24,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.aniwatch.AniWatch",
-      "versionCode": 1
+      "package": "com.xpNitro.An9where",
+      "versionCode": 1.1
     },
     "web": {
       "favicon": "./assets/favicon.png"
