@@ -14,7 +14,7 @@ jobs:
         uses: expo/expo-github-action@v6
         with:
           expo-version: 4.x
-          username: ${{ secrets.EXPO_USERNAME }}
+          username: jainprashul
           password: ${{ secrets.EXPO_PASSWORD }}
       - name: install dependencies
         run: yarn install
