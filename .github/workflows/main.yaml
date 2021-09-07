@@ -14,10 +14,10 @@ jobs:
         uses: expo/expo-github-action@5.1.1
         with:
           token: ${{ secrets.EXPO_TOKEN }}
+          username: ${{ secrets.EXPO_USERNAME }}
+          password: ${{ secrets.EXPO_PASSWORD }}
       - name: install dependencies
         run: npm install
       - name: build android
         run: expo build:android -t apk
-
-
-
+      
