@@ -5,18 +5,20 @@ import LocalStorage from './LocalStorage';
 // import firebase from './firebase'
 // import { useCurrentUser } from '../components/CurrentUser';
 
-const useFavorites = (Anime) => {
+const useFavorites = (anime) => {
     // console.log(Anime);
 
     const [showAddBtn, setShowAddBtn] = useState(true);
 
     // const { user, loading, error } = useCurrentUser();
 
-    const addToFavorites = ({ img, title, id }) => {
-        LocalStorage.getObject('favorites').then((data) => {
-            console.log(data);
-            let anime = { img, title, id };
+    const addToFavorites = (anime) => {
+        LocalStorage.getObject('favorites').then((res) => {
+            console.log(res);
+            let data = res ? res : [];
             let watchList = [...data, anime];
+
+            console.log('watchList', watchList);
             LocalStorage.setObject('favorites', watchList);
             ToastAndroid.show('Added to Favorites', ToastAndroid.SHORT);
             setShowAddBtn(false);
@@ -36,12 +38,11 @@ const useFavorites = (Anime) => {
     }
 
     const addToFav = () => {
-        let { img, title, id } = Anime;
-        addToFavorites({ img, title, id });
+        addToFavorites(anime);
     }
 
     const removeFromFav = (func = console.log) => {
-        removeFromFavorite(Anime.id)
+        removeFromFavorite(anime.id)
         setAnimeList(func)
     }
 
@@ -54,12 +55,14 @@ const useFavorites = (Anime) => {
 
     useEffect(() => {
         LocalStorage.getObject('favorites').then((data) => {
-            let isFav = data.find((item) => item.id === Anime.id);
+            if (data) {
+            let isFav = data.find((item) => item.id === anime.id);
             if (isFav) {
                 setShowAddBtn(false);
+                }
             }
         });
-    }, [Anime.id])
+    }, [anime.id])
 
     return {
         addToFav, removeFromFav,

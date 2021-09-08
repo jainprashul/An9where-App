@@ -1,9 +1,12 @@
 import React, { useEffect } from 'react'
-import { StyleSheet, View, Button, Image, ScrollView } from 'react-native'
-import { Card, Divider, Text } from 'react-native-elements'
+import { StyleSheet, View,  Image, ScrollView, TouchableOpacity } from 'react-native'
+import { Card, Divider, Button, Text } from 'react-native-elements'
 import { Chip } from 'react-native-elements'
 import { ScreenWidth } from 'react-native-elements/dist/helpers'
 import LocalStorage from '../helpers/LocalStorage'
+import useFavorites from '../helpers/useFavorites'
+import LottieView from 'lottie-react-native'
+import { Ionicons } from '@expo/vector-icons'
 
 const AnimeDetail = ({ route, navigation }) => {
 
@@ -11,7 +14,9 @@ const AnimeDetail = ({ route, navigation }) => {
     const [playEps, setPlayEps] = React.useState(null) // episode to play
     const [isFavorite, setIsFavorite] = React.useState(false) // check if anime is favorite
     const [playedEpisodes, setPlayedEpisodes] = React.useState([]) // array of episodes that have been played
+    const { addToFav, showAddBtn } = useFavorites(route.params)
 
+    const refIcon = React.useRef(null)
     //   console.log(img);
     // console.log(ScreenWidth);
 
@@ -30,11 +35,35 @@ const AnimeDetail = ({ route, navigation }) => {
         })
     }, [title, playEps])
 
+    const FavIcon = () => (
+        <TouchableOpacity disabled={!showAddBtn} style={{ flexDirection: 'row', alignItems: 'center' }} onPress={(e) => {
+            refIcon.current.play()
+        }}>
+            <LottieView source={require('../assets/animations/55154-favourite-icon.json')}
+                ref={refIcon}
+                style={{ height: 80, width: 80 }}
+                loop={false}
+                progress={showAddBtn ? 0 : 1}
+                onAnimationFinish={() => {
+                    addToFav(route.params)
+                }}
+                
+            />
+        </TouchableOpacity>
+    )
+
     return (
         <ScrollView style={styles.container}>
             <Card>
                 <Image source={{ uri: img }} style={styles.poster} />
-                <Button title={playEps ? `Play Episode-${playEps}` : `Watch Now`} onPress={() => navigation.navigate('Episode', { anime: route.params, playedEpisodes, currentPlaying: playEps ? playEps : 1 })} />
+                <View style={styles.bBox}>
+                    <Button title={playEps ? `Play Episode-${playEps}` : `Watch Now`}
+                        icon={<Ionicons name="play" size={20} color="white" />}
+                        raised containerStyle={{ ...styles.watchBtn, margin: 10}} buttonStyle={styles.watchBtn}
+                        onPress={() => navigation.navigate('Episode', { anime: route.params, playedEpisodes, currentPlaying: playEps ? playEps : 1 })} />
+                    <FavIcon />
+                    </View>
+                
                 <Divider orientation='horizontal' />
                 <Text h3 style={styles.title}>{title}</Text>
                 <Text h4 style={styles.altTitle}>{otherName}</Text>
@@ -80,6 +109,18 @@ const styles = StyleSheet.create({
         // fontSize: 20,
         // textAlign: 'center',
         // margin: 10,
+    },
+    bBox: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        // margin: 10,
+    },
+    watchBtn: {
+        backgroundColor: '#00b894',
+        width: ScreenWidth * 0.6,
+        height: 40,
+        borderRadius: 20,
     },
     description: {
         fontSize: 15,

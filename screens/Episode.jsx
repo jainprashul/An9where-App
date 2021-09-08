@@ -15,6 +15,8 @@ const Episode = ({ route, navigation }) => {
   const { currentPlaying, anime, playedEpisodes = [] } = route.params;
   const { episodes, id, title, synopsis, img, totalEpisodes } = anime;
 
+  const epsList = episodes?.length ? episodes : Array.from(Array(totalEpisodes).keys());
+
   // let totalEpisodes = episodes.length;
   const [videoLink, setVideoLink] = useState({});
   const [videosQuality, setVideosQuality] = useState({});
@@ -25,9 +27,10 @@ const Episode = ({ route, navigation }) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   const getEpisodes = () => {
+    const url = id.split('-episode-')[0].trim();
     const query = [
-      fetch(API.iframe(id, `episode-${episodeNo}`)),
-      fetch(API.iframeDub(id, `episode-${episodeNo}`))
+      fetch(API.iframe(url, `episode-${episodeNo}`)),
+      fetch(API.iframeDub(url, `episode-${episodeNo}`))
     ]
 
     Promise.all(query).then((responses) => (
@@ -116,7 +119,7 @@ const Episode = ({ route, navigation }) => {
   return (
     <ScrollView>
       <View style={styles.playerBox}>
-        {link.length ? <VideoPlayer link={link} videoQ={videoQ} /> : <Loading />}
+        {link?.length ? <VideoPlayer link={link} videoQ={videoQ} /> : <Loading />}
       </View>
       <View style={styles.container}>
         <View style={styles.playerDash}>
@@ -154,7 +157,7 @@ const Episode = ({ route, navigation }) => {
         <Text style={styles.episode}>Episode {episodeNo}</Text>
         <Text style={styles.description}>{synopsis}</Text>
         <View style={styles.chipBox}>
-          {episodes.map((item, index) => {
+          {epsList.map((item, index) => {
             const isPlayed = playedEpisodes.includes((index + 1));
             // console.log(isPlayed, index + 1);
             return (

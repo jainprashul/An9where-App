@@ -19,14 +19,19 @@ const Favorites = ({ route }) => {
             setIsLoading(false)
         }
         )
-        
+
     }, [])
 
     return (
         <View style={styles.container}>
             {favorites.length ? <AniGrid data={favorites} title="Favorites" />
                 :
-                <Text>You don't have any favorites yet</Text>}
+                <View style={styles.textBox}>
+                    <Text>You don't have any favorites yet</Text>
+                </View>
+            }
+            
+            
             {/* <Text >{title}</Text>
         <Text>{description}</Text>
         <Image source={{uri: image}} style={styles.image} /> */}
@@ -37,9 +42,11 @@ const Favorites = ({ route }) => {
 
 const styles = StyleSheet.create({
     container: {
+
+    },
+    textBox: {
         marginTop: 50,
         flex: 1,
-        // justifyContent: 'center',
         alignItems: 'center',
     },
     welcome: {
