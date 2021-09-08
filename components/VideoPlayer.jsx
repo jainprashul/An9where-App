@@ -1,19 +1,22 @@
 import { Video } from 'expo-av'
 import React, { useEffect, useRef, useState } from 'react'
-import { StatusBar, StyleSheet, Text, TouchableNativeFeedback, TouchableWithoutFeedback, TouchableWithoutFeedbackBase, View } from 'react-native'
-import { ScreenWidth } from 'react-native-elements/dist/helpers'
+import { BackHandler, StatusBar, StyleSheet, Text, TouchableNativeFeedback, TouchableWithoutFeedback, TouchableWithoutFeedbackBase, View } from 'react-native'
+import { ScreenHeight, ScreenWidth } from 'react-native-elements/dist/helpers'
 import { API } from '../helpers/Const'
 import Loading from '../components/Loading'
 import { getFromApi } from '../helpers/hooks';
 import { Ionicons } from '@expo/vector-icons'
 import Slider from '@react-native-community/slider'
 import { BottomSheet, ListItem } from 'react-native-elements'
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 let qualities = ['HDP', 'SDP', '360P', '480P', '720P', '1080P']
 const VideoPlayer = ({ link, videoQ }) => {
 
     const video = useRef(null)
     const [videoLinks, setVideoLinks] = useState(videoQ)
+    const [fullScreen, setFullScreen] = useState(false);
+    const [rate, setRate] = useState(1);
     const [optionVisible, setOptionVisible] = useState(false)
     const [src, setSrc] = useState('')
     const [paused, setPaused] = useState(false)
@@ -47,10 +50,19 @@ const VideoPlayer = ({ link, videoQ }) => {
         })
         console.log('Player loaded');
         StatusBar.setHidden(true);
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (fullScreen) {
+                onFullScreen()
+                return true;
+            }
+            return false;
+        });
+
         return () => {
             // setLoading(true)
             console.log('Player unmounted');
             StatusBar.setHidden(false);
+            backHandler.remove();
         }
     }, [link, videoQ])
 
@@ -72,6 +84,41 @@ const VideoPlayer = ({ link, videoQ }) => {
         }
     }
 
+
+    const onFullScreen = () => {
+        setFullScreen(!fullScreen);
+        if (fullScreen) {
+
+            const orientation = fullScreen ? ScreenOrientation.OrientationLock.PORTRAIT : ScreenOrientation.OrientationLock.LANDSCAPE;
+            ScreenOrientation.lockAsync(orientation);
+            // video.current.presentFullscreenPlayer();
+        } else {
+            const orientation = fullScreen ? ScreenOrientation.OrientationLock.PORTRAIT : ScreenOrientation.OrientationLock.LANDSCAPE;
+            // ScreenOrientation.unlockAsync();
+            ScreenOrientation.lockAsync(orientation);
+
+            // video.current.dismissFullscreenPlayer();
+        }
+        // logEvent('Player', 'FullScreen', 'FullScreen');
+        console.log('FullScreen', fullScreen);
+    }
+
+    const onFullscreenUpdate = ({ fullscreenUpdate, status }) => {
+        console.log(fullscreenUpdate, status)
+        switch (fullscreenUpdate) {
+            case Video.FULLSCREEN_UPDATE_PLAYER_WILL_PRESENT:
+                console.log(' the fullscreen player is about to present')
+                break
+            case Video.FULLSCREEN_UPDATE_PLAYER_DID_PRESENT:
+                console.log('the fullscreen player just finished presenting')
+                break
+            case Video.FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS:
+                console.log('the fullscreen player is about to dismiss')
+                break
+            case Video.FULLSCREEN_UPDATE_PLAYER_DID_DISMISS:
+                console.log('the fullscreen player just finished dismissing')
+        }
+    }
 
 
     const playPause = () => {
@@ -150,19 +197,23 @@ const VideoPlayer = ({ link, videoQ }) => {
 
 
     return (
-        <View>
+        <View style={fullScreen ? styles.fullScreenVideo : styles.video }>
             {loading ? <Loading /> :
                 <Video
                     ref={video}
-                    style={styles.video}
+                    style={{ ...StyleSheet.absoluteFillObject}}
                     source={{
                         uri: src,
                     }}
+            
+                    rate={rate}
+                    onFullscreenUpdate={onFullscreenUpdate}
                     resizeMode="contain"
                     shouldPlay={true}
                     progressUpdateIntervalMillis={1000}
                     onLoad={(status) => { setStatus(status) }}
                     onPlaybackStatusUpdate={status => setStatus(() => status)}
+
                 />}
 
             <View style={styles.overlay}>
@@ -175,7 +226,7 @@ const VideoPlayer = ({ link, videoQ }) => {
                         <View style={styles.timer}>
                             <Text style={{ color: 'white' }} >{getTimeFromMillis(status.positionMillis)}</Text>
                             <Text style={{ color: 'white' }}>{getTimeFromMillis(status.durationMillis)}
-                                <Ionicons name='expand' style={{ color: 'white', fontSize: 15 }} />
+                                <Ionicons name={fullScreen ? 'contract' : 'expand'} onPress={onFullScreen} style={{ color: 'white', fontSize: 20,padding  : 10 }} />
                             </Text>
                         </View>
                         <Slider
@@ -233,24 +284,37 @@ const styles = StyleSheet.create({
         // marginTop: StatusBar.currentHeight,
         backgroundColor: 'black',
     },
+
+    fullScreenVideo: {
+        width: ScreenHeight,
+        height: ScreenWidth,
+        // // marginTop: StatusBar.currentHeight,
+        backgroundColor: 'black',
+        // ...StyleSheet.absoluteFill,
+        elevation: 10,
+        
+    },
     overlay: {
         ...StyleSheet.absoluteFillObject,
+        
         // backgroundColor: 'rgba(0,0,0,0.5)',
     },
     overlaySet: {
         flex: 1,
         flexDirection: 'row',
-        // justifyContent: 'space-between',
+        justifyContent: 'space-around',
         // alignItems: 'center',
         // paddingHorizontal: 10,
         // paddingVertical: 10,
     },
     icon: {
         color: '#fff',
-        flex: 1,
+        // flex: 1,
         textAlign: 'center',
         textAlignVertical: 'center',
         fontSize: 40,
+        // backgroundColor: 'red',
+        // margin: 50,
 
     },
     sliderContainer: {

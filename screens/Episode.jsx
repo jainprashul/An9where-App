@@ -2,14 +2,16 @@ import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { ScrollView, ScrollViewBase, StatusBar, TouchableOpacity } from 'react-native';
-import { StyleSheet, Text, View } from 'react-native';
-import { ButtonGroup, Chip, Icon } from 'react-native-elements';
+import { StyleSheet, View } from 'react-native';
+import { ButtonGroup, Text, Chip, Icon } from 'react-native-elements';
 import Player from '../components/Player';
 import VideoPlayer from '../components/VideoPlayer';
 import { API } from '../helpers/Const'
 import LocalStorage from '../helpers/LocalStorage';
 import Loading from '../components/Loading';
 import { ScreenWidth } from 'react-native-elements/dist/helpers';
+import useFavorites from '../helpers/useFavorites';
+import AnimatedLottieView from 'lottie-react-native';
 
 const Episode = ({ route, navigation }) => {
   const { currentPlaying, anime, playedEpisodes = [] } = route.params;
@@ -25,6 +27,9 @@ const Episode = ({ route, navigation }) => {
   const [episodeNo, setEpisodeNo] = useState(currentPlaying);
   const [error, setError] = useState(<Text></Text>)
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const { addToFav, showAddBtn } = useFavorites(anime)
+
+  const refIcon = React.useRef(null);
 
   const getEpisodes = () => {
     const url = id.split('-episode-')[0].trim();
@@ -116,11 +121,28 @@ const Episode = ({ route, navigation }) => {
   console.log(episodeNo, videoLink);
   // console.log(playedEpisodes);
 
+  const FavIcon = () => (
+    <TouchableOpacity disabled={!showAddBtn} style={{ flexDirection: 'row', alignItems: 'center' }} onPress={(e) => {
+      refIcon.current.play()
+    }}>
+      <AnimatedLottieView source={require('../assets/animations/55154-favourite-icon.json')}
+        ref={refIcon}
+        style={{ height: 80, width: 80 }}
+        loop={false}
+        progress={showAddBtn ? 0 : 1}
+        onAnimationFinish={() => {
+          addToFav(anime)
+        }}
+
+      />
+    </TouchableOpacity>
+  )
+
   return (
     <ScrollView>
-      <View style={styles.playerBox}>
+      {/* <View style={styles.playerBox}> */}
         {link?.length ? <VideoPlayer link={link} videoQ={videoQ} /> : <Loading />}
-      </View>
+      {/* </View> */}
       <View style={styles.container}>
         <View style={styles.playerDash}>
           <Icon name="play-skip-back-sharp" type="ionicon" onPress={() => {
@@ -144,8 +166,6 @@ const Episode = ({ route, navigation }) => {
               setLink(videoLink.sub);
               setVideoQ(videosQuality.sub);
             }
-            // (index === 0) ? setLink(videoLink.dub) : setLink(videoLink.sub)
-            // (index === 0) ? setVideosQuality(videosQuality.dub) : setVideosQuality(videosQuality.sub)
             console.log(index, videoLink);
           }}
           selectedIndex={selectedIndex}
@@ -153,7 +173,11 @@ const Episode = ({ route, navigation }) => {
           containerStyle={{ borderRadius: 10, height: 50 }}
           selectedButtonStyle={{ backgroundColor: '#3399FF' }}
         /> : null}
-        <Text style={styles.title}>{title}</Text>
+
+        <View style={styles.bBox}>
+          <Text style={styles.title}>{title}</Text>
+          <FavIcon />
+          </View>
         <Text style={styles.episode}>Episode {episodeNo}</Text>
         <Text style={styles.description}>{synopsis}</Text>
         <View style={styles.chipBox}>
@@ -184,8 +208,10 @@ const styles = StyleSheet.create({
     // marginTop: StatusBar.currentHeight
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Roboto',
+    width: ScreenWidth * 0.8,
   },
   errorBox: {
     flex: 1,
@@ -197,6 +223,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     // color: 'red',
+  },
+  bBox: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   chipBox: {
     flex: 1,
@@ -214,7 +246,7 @@ const styles = StyleSheet.create({
     width: ScreenWidth,
     height: ScreenWidth * 0.5625,
     backgroundColor: '#000',
-    // marginTop: StatusBar.currentHeight
+    marginTop: StatusBar.currentHeight
   },
   episode: {
     // fontSize: 15,
