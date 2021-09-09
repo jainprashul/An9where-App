@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { ScrollView, ScrollViewBase, StatusBar, TouchableOpacity } from 'react-native';
+import { ScrollView, ScrollViewBase, StatusBar, ToastAndroid, TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { ButtonGroup, Text, Chip, Icon } from 'react-native-elements';
 import Player from '../components/Player';
@@ -27,6 +27,7 @@ const Episode = ({ route, navigation }) => {
   const [episodeNo, setEpisodeNo] = useState(currentPlaying);
   const [error, setError] = useState(<Text></Text>)
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [scrollLock, setScrollLock] = useState(false)
   const { addToFav, showAddBtn } = useFavorites(anime)
 
   const refIcon = React.useRef(null);
@@ -68,7 +69,9 @@ const Episode = ({ route, navigation }) => {
         setVideoQ(videoQ)
         savingEpisode();
       }).catch((error) => {
-        console.error("Error : ", error);
+        console.log("Error : ", error);
+        ToastAndroid.showWithGravity("Error : Fetching, Please load after sometime", ToastAndroid.SHORT, ToastAndroid.TOP);
+        getEpisodes();
       });
   }
 
@@ -139,9 +142,11 @@ const Episode = ({ route, navigation }) => {
   )
 
   return (
-    <ScrollView>
+    <ScrollView 
+      scrollEnabled={!scrollLock}
+    >
       {/* <View style={styles.playerBox}> */}
-        {link?.length ? <VideoPlayer link={link} videoQ={videoQ} /> : <Loading />}
+        {link?.length ? <VideoPlayer link={link} videoQ={videoQ} scroll={{scrollLock, setScrollLock}} /> : <Loading />}
       {/* </View> */}
       <View style={styles.container}>
         <View style={styles.playerDash}>

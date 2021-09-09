@@ -1,6 +1,6 @@
 import { Video } from 'expo-av'
 import React, { useEffect, useRef, useState } from 'react'
-import { BackHandler, StatusBar, StyleSheet, Text, TouchableNativeFeedback, TouchableWithoutFeedback, TouchableWithoutFeedbackBase, View } from 'react-native'
+import { BackHandler, StatusBar, StyleSheet, Text, ToastAndroid, TouchableNativeFeedback, View } from 'react-native'  
 import { ScreenHeight, ScreenWidth } from 'react-native-elements/dist/helpers'
 import { API } from '../helpers/Const'
 import Loading from '../components/Loading'
@@ -9,19 +9,23 @@ import { Ionicons } from '@expo/vector-icons'
 import Slider from '@react-native-community/slider'
 import { BottomSheet, ListItem } from 'react-native-elements'
 import * as ScreenOrientation from 'expo-screen-orientation';
+import SystemNavigationBar from 'react-native-system-navigation-bar'
+
 
 let qualities = ['HDP', 'SDP', '360P', '480P', '720P', '1080P']
-const VideoPlayer = ({ link, videoQ }) => {
+const VideoPlayer = ({ link, videoQ, scroll }) => {
 
     const video = useRef(null)
-    const [videoLinks, setVideoLinks] = useState(videoQ)
+    const { scrollLock, setScrollLock } = scroll;
+    const [videoLinks, setVideoLinks] = useState(videoQ);
     const [fullScreen, setFullScreen] = useState(false);
     const [rate, setRate] = useState(1);
     const [optionVisible, setOptionVisible] = useState(false)
     const [src, setSrc] = useState('')
     const [paused, setPaused] = useState(false)
     const [overlay, setOverlay] = useState(false)
-    const [status, setStatus] = React.useState({
+
+    const [status, setStatus] = useState({
         positionMillis: 0,
         durationMillis: 100,
     });
@@ -45,26 +49,28 @@ const VideoPlayer = ({ link, videoQ }) => {
             }
             console.log(videoLink);
             setVideoLinks(videoLink);
-            setSrc(videoLink.hd)
-            setLoading(false)
+            setSrc(videoLink.sd)
+            // setLoading(false)
         })
         console.log('Player loaded');
         StatusBar.setHidden(true);
-        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            if (fullScreen) {
-                onFullScreen()
-                return true;
-            }
-            return false;
-        });
+        // const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        //     if (fullScreen) {
+        //         onFullScreen()
+        //         return true;
+        //     }
+        //     return false;
+        // });
 
         return () => {
             // setLoading(true)
             console.log('Player unmounted');
             StatusBar.setHidden(false);
-            backHandler.remove();
+            // backHandler.remove();
         }
     }, [link, videoQ])
+
+    console.log('src', src);
 
     let lastTap = null;
     let timer = null;
@@ -87,15 +93,20 @@ const VideoPlayer = ({ link, videoQ }) => {
 
     const onFullScreen = () => {
         setFullScreen(!fullScreen);
+        setScrollLock(!scrollLock);
         if (fullScreen) {
 
             const orientation = fullScreen ? ScreenOrientation.OrientationLock.PORTRAIT : ScreenOrientation.OrientationLock.LANDSCAPE;
             ScreenOrientation.lockAsync(orientation);
+            const s = SystemNavigationBar.navigationHide();
+            console.log(s);
             // video.current.presentFullscreenPlayer();
         } else {
             const orientation = fullScreen ? ScreenOrientation.OrientationLock.PORTRAIT : ScreenOrientation.OrientationLock.LANDSCAPE;
             // ScreenOrientation.unlockAsync();
             ScreenOrientation.lockAsync(orientation);
+            let s = SystemNavigationBar.navigationShow();
+            console.log(s);
 
             // video.current.dismissFullscreenPlayer();
         }
@@ -211,7 +222,15 @@ const VideoPlayer = ({ link, videoQ }) => {
                     resizeMode="contain"
                     shouldPlay={true}
                     progressUpdateIntervalMillis={1000}
-                    onLoad={(status) => { setStatus(status) }}
+                    onLoad={(status) => {
+                        setStatus(status)
+                        setLoading(false)
+                        console.log('onLoad', "DONE");
+                    }}
+                    onError={(error) => {
+                        console.log('onError', error);
+                        ToastAndroid.show(error, ToastAndroid.SHORT);
+                    }}
                     onPlaybackStatusUpdate={status => setStatus(() => status)}
 
                 />}
@@ -226,7 +245,7 @@ const VideoPlayer = ({ link, videoQ }) => {
                         <View style={styles.timer}>
                             <Text style={{ color: 'white' }} >{getTimeFromMillis(status.positionMillis)}</Text>
                             <Text style={{ color: 'white' }}>{getTimeFromMillis(status.durationMillis)}
-                                <Ionicons name={fullScreen ? 'contract' : 'expand'} onPress={onFullScreen} style={{ color: 'white', fontSize: 20,padding  : 10 }} />
+                                <Ionicons name={fullScreen ? 'contract' : 'expand'} onPress={onFullScreen} style={{ color: 'white', fontSize: 25,padding  : 10 , margin : 10}} />
                             </Text>
                         </View>
                         <Slider
