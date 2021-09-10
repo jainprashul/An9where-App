@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, Image, TouchableOpacity, TouchableOpacityBase, VirtualizedList } from 'react-native';
+import { FlatList, Image, LogBox, TouchableOpacity, TouchableOpacityBase, VirtualizedList, YellowBox } from 'react-native';
 import { ScrollView } from 'react-native';
 import { StyleSheet, View, Text, Button } from 'react-native'
 import { Icon } from 'react-native-elements';
@@ -55,6 +55,7 @@ const Home = ({ navigation }) => {
   }
 
   useEffect(() => {
+    LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
     getAnime();
     console.log('Data Fetched');
   }, []);

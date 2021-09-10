@@ -8,40 +8,36 @@ import { getFromApi } from '../helpers/hooks';
 import { Ionicons } from '@expo/vector-icons'
 import Slider from '@react-native-community/slider'
 import { BottomSheet, ListItem } from 'react-native-elements'
-import * as ScreenOrientation from 'expo-screen-orientation';
-import SystemNavigationBar from 'react-native-system-navigation-bar'
+import useFullscreen from '../helpers/useFullscreen'
+
 
 
 let qualities = ['HDP', 'SDP', '360P', '480P', '720P', '1080P']
 const VideoPlayer = ({ link, videoQ, scroll }) => {
 
     const video = useRef(null)
-    const { scrollLock, setScrollLock } = scroll;
     const [videoLinks, setVideoLinks] = useState(videoQ);
-    const [fullScreen, setFullScreen] = useState(false);
     const [rate, setRate] = useState(1);
     const [optionVisible, setOptionVisible] = useState(false)
     const [src, setSrc] = useState('')
     const [paused, setPaused] = useState(false)
     const [overlay, setOverlay] = useState(false)
 
+    const { fullScreen, onFullScreen , setFullScreen, backButtonHandle } = useFullscreen(scroll)
+
     const [status, setStatus] = useState({
         positionMillis: 0,
         durationMillis: 100,
-    });
+    }); 
     let sliderValue = (status.positionMillis / status.durationMillis) || 0;
     const [loading, setLoading] = useState(false)
-
-
 
     // console.log(sliderValue , status.isBuffering);
 
     useEffect(() => {
         console.log("Link: ", link);
-        // console.log("Video: ", videoQ);
-        // setSrc(videoQ['HDP'])
-        // console.log(videoQ['1080P']);
         setLoading(true)
+        
         getFromApi(API.videoLink(link)).then((data) => {
             let videoLink = {
                 hd: data.iframeUrl[0].url,
@@ -50,17 +46,12 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
             console.log(videoLink);
             setVideoLinks(videoLink);
             setSrc(videoLink.sd)
-            // setLoading(false)
+            setLoading(false)
         })
         console.log('Player loaded');
         StatusBar.setHidden(true);
-        // const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-        //     if (fullScreen) {
-        //         onFullScreen()
-        //         return true;
-        //     }
-        //     return false;
-        // });
+        
+
 
         return () => {
             // setLoading(true)
@@ -70,12 +61,17 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
         }
     }, [link, videoQ])
 
-    console.log('src', src);
 
     let lastTap = null;
     let timer = null;
     let overlayTimer = null;
+    const OVERLAY_SCREEN_TIME = 5000;
 
+    /**
+     * Handle double tap event
+     * @param {Function} doubleTapCallback Fn() to be called when double tap
+     * @param {Function} oneTapCallback Fn() to be called when single tap
+     */
     const handleDoubleTap = (doubleTapCallback, oneTapCallback) => {
         const now = Date.now();
         const DOUBLE_PRESS_DELAY = 300;
@@ -90,83 +86,58 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
         }
     }
 
-
-    const onFullScreen = () => {
-        setFullScreen(!fullScreen);
-        setScrollLock(!scrollLock);
-        if (fullScreen) {
-
-            const orientation = fullScreen ? ScreenOrientation.OrientationLock.PORTRAIT : ScreenOrientation.OrientationLock.LANDSCAPE;
-            ScreenOrientation.lockAsync(orientation);
-            const s = SystemNavigationBar.navigationHide();
-            console.log(s);
-            // video.current.presentFullscreenPlayer();
-        } else {
-            const orientation = fullScreen ? ScreenOrientation.OrientationLock.PORTRAIT : ScreenOrientation.OrientationLock.LANDSCAPE;
-            // ScreenOrientation.unlockAsync();
-            ScreenOrientation.lockAsync(orientation);
-            let s = SystemNavigationBar.navigationShow();
-            console.log(s);
-
-            // video.current.dismissFullscreenPlayer();
-        }
-        // logEvent('Player', 'FullScreen', 'FullScreen');
-        console.log('FullScreen', fullScreen);
-    }
-
-    const onFullscreenUpdate = ({ fullscreenUpdate, status }) => {
-        console.log(fullscreenUpdate, status)
-        switch (fullscreenUpdate) {
-            case Video.FULLSCREEN_UPDATE_PLAYER_WILL_PRESENT:
-                console.log(' the fullscreen player is about to present')
-                break
-            case Video.FULLSCREEN_UPDATE_PLAYER_DID_PRESENT:
-                console.log('the fullscreen player just finished presenting')
-                break
-            case Video.FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS:
-                console.log('the fullscreen player is about to dismiss')
-                break
-            case Video.FULLSCREEN_UPDATE_PLAYER_DID_DISMISS:
-                console.log('the fullscreen player just finished dismissing')
-        }
-    }
-
-
     const playPause = () => {
         status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()
         setPaused(!paused)
     }
 
-    const seekBackward = (value = 10000) => {
+    /**
+     * seek to position in milliseconds
+     * @param {number} value default value is 30sec
+     * @default value = 30000
+     */
+    const seekBackward = (value = 30000) => {
         let pos = status.positionMillis - value;
         video.current.playFromPositionAsync(pos)
         console.log('seekbackward', pos);
         clearTimeout(overlayTimer)
         overlayTimer = setTimeout(() => {
             setOverlay(false)
-        }, 3000)
+        }, OVERLAY_SCREEN_TIME )
     }
-    const seekForward = (value = 10000) => {
+
+    /**
+     * seek to position in milliseconds
+     * @param {number} value default value is 30sec
+     * @default value = 30000
+     */
+    const seekForward = (value = 30000) => {
         let pos = status.positionMillis + value
         video.current.playFromPositionAsync(pos)
         console.log('seekForward', pos);
         clearTimeout(overlayTimer)
         overlayTimer = setTimeout(() => {
             setOverlay(false)
-        }, 3000)
+        }, OVERLAY_SCREEN_TIME )
     }
 
+    /**
+     * seek to position in milliseconds
+     * @param {number} value default value is 5sec
+     * @default value = 5000
+     */
     const youtubeSeekLeft = (value = 5000) => {
         const doubleTap = () => {
             let pos = status.positionMillis - value;
             video.current.playFromPositionAsync(pos)
+            console.log('double Tap Left', pos);
         }
         const singleTap = () => {
             setOverlay(true)
             console.log('single tap LEFT');
             overlayTimer = setTimeout(() => {
                 setOverlay(false)
-            }, 3000)
+            }, OVERLAY_SCREEN_TIME )
         }
 
         handleDoubleTap(doubleTap, singleTap)
@@ -175,9 +146,8 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
     const youtubeSeekRight = (value = 5000) => {
         const doubleTap = () => {
             let pos = status.positionMillis + value;
-            console.log(pos);
             video.current.playFromPositionAsync(pos)
-            console.log('double tap RIGHT');
+            console.log('double tap RIGHT', pos);
 
         }
         const singleTap = () => {
@@ -185,7 +155,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
             console.log('single tap RIGHT');
             overlayTimer = setTimeout(() => {
                 setOverlay(false)
-            }, 3000)
+            }, OVERLAY_SCREEN_TIME )
         }
 
         handleDoubleTap(doubleTap, singleTap)
@@ -198,7 +168,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
         clearTimeout(overlayTimer)
         overlayTimer = setTimeout(() => {
             setOverlay(false)
-        }, 3000)
+        }, OVERLAY_SCREEN_TIME )
     }
 
     const handleOption = (e) => {
@@ -218,7 +188,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
                     }}
             
                     rate={rate}
-                    onFullscreenUpdate={onFullscreenUpdate}
+                    // onFullscreenUpdate={onFullscreenUpdate}
                     resizeMode="contain"
                     shouldPlay={true}
                     progressUpdateIntervalMillis={1000}
@@ -259,7 +229,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
 
                     <View style={styles.optionContainer}>
                         <View style={styles.option}>
-                            <Ionicons name='ellipsis-vertical' style={{ color: 'white', fontSize: 25, padding: 5 }} onPress={handleOption} />
+                            <Ionicons name='ellipsis-vertical' style={{ color: 'white', fontSize: 25, padding: 5 , margin  : 10}} onPress={handleOption} />
                         </View>
 
 
@@ -356,13 +326,16 @@ const styles = StyleSheet.create({
     }
 })
 
-/** convert milliseconds to time */
-const getTimeFromMillis = (t) => {
+/** convert milliseconds to time 
+ * @param {number} millis
+ * @return {string} Time in format "hh:mm:ss"
+*/
+const getTimeFromMillis = (millis) => {
     // console.log(t);
     const digit = n => n < 10 ? `0${n}` : `${n}`;
-    const sec = digit(Math.floor(t / 1000) % 60);
-    const min = digit(Math.floor(t / 60000) % 60);
-    const hour = digit(Math.floor(t / 3600000) % 60);
+    const sec = digit(Math.floor(millis / 1000) % 60);
+    const min = digit(Math.floor(millis / 60000) % 60);
+    const hour = digit(Math.floor(millis / 3600000) % 60);
 
     return `${hour}:${min}:${sec}`;
     // 33 => 00:00:33

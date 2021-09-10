@@ -18,5 +18,9 @@ jobs:
           password: ${{ secrets.EXPO_PASSWORD }}
       - name: install dependencies
         run: yarn install
+      - name: publish update
+        run: expo publish
+      - name: export to github docs
+        run: expo export --public-url https://jainprashul.github.io/An9where-App
       - name: build android
         run: expo build:android -t apk

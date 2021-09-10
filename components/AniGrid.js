@@ -14,7 +14,6 @@ const AniCard = ({anime}) => {
     return (
         <TouchableOpacity onPress={() => {
             navigation.push('AnimeDetail', anime);
-            console.log(anime);
         }}>
             <Card containerStyle={styles.container}>
                 <Card.Title>{title}</Card.Title>

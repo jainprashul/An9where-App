@@ -9,16 +9,28 @@ const Favorites = ({ route }) => {
     const [favorites, setFavorites] = React.useState([])
     const [isLoading, setIsLoading] = React.useState(true)
     const [error, setError] = React.useState(null)
-
+    const [watchlist, setWatchlist] = React.useState([])
 
     useEffect(() => {
         LocalStorage.getObject('favorites').then(data => {
-            console.log(data)
             let res = data ? [...data] : []
             setFavorites(res)
             setIsLoading(false)
-        }
-        )
+        })
+
+        LocalStorage.getObject('watching').then(data => {
+            // console.log('raw', data);
+            let res = data ? { ...data } : {}
+            const keys = Object.keys(res);
+            let watched = [];
+            keys.forEach((key) => {
+                let d = res[key];
+                if (d.totalEpisodes <= d.currentPlaying || d.totalEpisodes == null) watched.push(d);
+            })
+            setWatchlist(watched)
+            // console.log('upas', watched);
+            setIsLoading(false)
+        })
 
     }, [])
 
@@ -30,12 +42,12 @@ const Favorites = ({ route }) => {
                     <Text>You don't have any favorites yet</Text>
                 </View>
             }
-            
-            
-            {/* <Text >{title}</Text>
-        <Text>{description}</Text>
-        <Image source={{uri: image}} style={styles.image} /> */}
-
+            {watchlist.length ? <AniGrid data={watchlist} title="Watching" />
+                :
+                <View style={styles.textBox}>
+                    <Text>You don't have watched anything yet</Text>
+                </View>
+            }
         </View>
     )
 }

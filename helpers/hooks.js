@@ -39,6 +39,11 @@ export function useStorage(key, initialValue) {
 }
 
 
+/**
+ * Fetches data from the API
+ * @param {string} api_url 
+ * @returns {Promise<any>} - JSON response
+ */
 export function getFromApi(api_url) {
     return fetch(api_url)
       .then((response) => response.json())

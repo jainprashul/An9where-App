@@ -12,10 +12,11 @@ import Loading from '../components/Loading';
 import { ScreenWidth } from 'react-native-elements/dist/helpers';
 import useFavorites from '../helpers/useFavorites';
 import AnimatedLottieView from 'lottie-react-native';
+import useFullscreen from '../helpers/useFullscreen';
 
 const Episode = ({ route, navigation }) => {
   const { currentPlaying, anime, playedEpisodes = [] } = route.params;
-  const { episodes, id, title, synopsis, img, totalEpisodes } = anime;
+  const { episodes, id: oldID, title, synopsis, img, totalEpisodes } = anime;
 
   const epsList = episodes?.length ? episodes : Array.from(Array(totalEpisodes).keys());
 
@@ -30,10 +31,12 @@ const Episode = ({ route, navigation }) => {
   const [scrollLock, setScrollLock] = useState(false)
   const { addToFav, showAddBtn } = useFavorites(anime)
 
+  const {backButtonHandle} = useFullscreen({scrollLock, setScrollLock})
+
   const refIcon = React.useRef(null);
 
   const getEpisodes = () => {
-    const url = id.split('-episode-')[0].trim();
+    const url = oldID.split('-episode-')[0].replace('/', '').trim();
     const query = [
       fetch(API.iframe(url, `episode-${episodeNo}`)),
       fetch(API.iframeDub(url, `episode-${episodeNo}`))
@@ -54,7 +57,6 @@ const Episode = ({ route, navigation }) => {
           sub: sub.videos,
           dub: dub.videos,
         }
-        console.log(videosQualityDict);
         setVideosQuality(videosQualityDict);
 
         let videoLinks = {
@@ -79,34 +81,26 @@ const Episode = ({ route, navigation }) => {
   const savingEpisode = (player) => {
     playedEpisodes.includes(episodeNo) ? null : playedEpisodes.push(episodeNo);
     let state = {
+      ...anime,
       currentPlaying: episodeNo,
       name: title,
       img,
-      id,
+      id: oldID.split('-episode-')[0].replace('/', '').trim(), // id of the anime without episode
       totalEpisodes,
-      playedEpisodes
+      playedEpisodes,
+      currentTime: player?.currentTime || 0,
+      progress: player ? (player.currentTime / player.duration) * 100 : 0
     }
-
-    if (player) {
-      state = {
-        currentPlaying: episodeNo,
-        name: title,
-        img,
-        id,
-        totalEpisodes,
-        playedEpisodes,
-        currentTime: player.currentTime,
-        progress: (player.currentTime / player.duration) * 100,
-      }
-    }
-
+    !player && console.log('Saving', state);
     LocalStorage.getObject('watching').then((data) => {
-      // let watchList = data ? data : {};
-      let watchList = {};
-      watchList[id] = state;
+      console.log('locaal',data);
+      let watchList = data ? data : {};
+      watchList[state.id] = state;
+
+      console.log('updaye', watchList);
       LocalStorage.setObject('watching', watchList);
     })
-    !player && console.log('Saving', state);
+    
   }
 
   useEffect(() => {
@@ -114,11 +108,14 @@ const Episode = ({ route, navigation }) => {
       title: `Episode ${episodeNo} - ${title}`
     })
     getEpisodes();
+    const backButton = backButtonHandle();
     return () => {
       setVideoLink({});
       setLink('');
+      backButton.remove();
       console.log('Unmounting EPS');
     }
+    
   }, [episodeNo])
 
   console.log(episodeNo, videoLink);

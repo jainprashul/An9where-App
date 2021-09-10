@@ -11,7 +11,7 @@ import Home from './screens/Home';
 import Episode from './screens/Episode';
 import Genre from './screens/Genre';
 import Search from './components/Search';
-import * as Updates from 'expo-updates';
+
  
 const Stack = createNativeStackNavigator();
 

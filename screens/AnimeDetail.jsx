@@ -17,8 +17,6 @@ const AnimeDetail = ({ route, navigation }) => {
     const { addToFav, showAddBtn } = useFavorites(route.params)
 
     const refIcon = React.useRef(null)
-    //   console.log(img);
-    // console.log(ScreenWidth);
 
     useEffect(() => {
         navigation.setOptions({
