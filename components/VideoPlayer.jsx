@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons'
 import Slider from '@react-native-community/slider'
 import useFullscreen from '../helpers/useFullscreen'
 import VideoOptions from './VideoOptions'
+import { deactivateKeepAwake } from 'expo-keep-awake'
 
 
 
@@ -88,7 +89,13 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
     }
 
     const playPause = () => {
-        status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()
+        if (status.isPlaying){
+            video.current.pauseAsync()
+            deactivateKeepAwake('video')
+        } else {
+            video.current.playAsync()
+            activateKeepAwake('video')
+        }
         setPaused(!paused)
     }
 
