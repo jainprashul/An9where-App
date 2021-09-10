@@ -45,7 +45,7 @@ const Home = ({ navigation }) => {
     getFromApi(API.newSeasons(1)).then((movies) => {
       LocalStorage.setObject('NewSeasons', movies);
       setNewSeasons(movies);
-      setBanner(movies.slice(0, 7));
+      setBanner(movies.slice(0, 8));
     });
     getFromApi(API.recent_eps).then((movies) => {
       LocalStorage.setObject('Recent', movies);
