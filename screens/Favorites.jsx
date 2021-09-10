@@ -20,21 +20,41 @@ const Favorites = ({ route, navigation }) => {
         })
 
         LocalStorage.getObject('watching').then(data => {
-            console.log('raw', data);
             let res = data ? { ...data } : {}
+            console.log('raw', res);
+
             const keys = Object.keys(res);
             let watched = [];
             keys.forEach((key) => {
                 let d = res[key];
-
+                console.log(d);
                 // watched.push(d);
-                if (d.totalEpisodes <= d.currentPlaying || d.totalEpisodes == null) watched.push(d);
+                if (d.totalEpisodes >= d.currentPlaying || d.totalEpisodes == null) watched.push(d);
             })
-            console.log('watched', watched);
+            // console.log('watched', watched);
             setWatchlist(watched)
         })
 
     }, [])
+
+
+    const removeFromWatchList = (id) => {
+        LocalStorage.getObject('watching').then(data => {
+            let res = data ? { ...data } : {}
+            delete res[id];
+            LocalStorage.setObject('watching', res);
+            const keys = Object.keys(res);
+            let watched = [];
+            keys.forEach((key) => {
+                let d = res[key];
+                console.log(d);
+                // watched.push(d);
+                if (d.totalEpisodes >= d.currentPlaying || d.totalEpisodes == null) watched.push(d);
+            })
+            setWatchlist(watched)
+        }
+        )
+    }
 
     const Item = ({ item, headerTitle }) => {
         const { img, title, synopsis, id } = item;
@@ -44,12 +64,18 @@ const Favorites = ({ route, navigation }) => {
             <ListItem.Swipeable bottomDivider onPress={(e) => {
                 navigation.push('AnimeDetail', item)
             }} rightContent={
-                (headerTitle == "Favorites") && <Button
+                (headerTitle == "Favorites") ? <Button
                     title="Delete"
                     icon={{ name: 'delete', color: 'white' }}
                     buttonStyle={{ minHeight: '100%', backgroundColor: 'red' }}
-                    onPress={() => { removeFromFav(setFavorites) }}
-                />
+                    onPress={() => { removeFromFav(setFavorites) }} 
+                /> :
+                    <Button
+                        title="Done"
+                        icon={{ name: 'check-circle', color: 'white' }}
+                        buttonStyle={{ minHeight: '100%', backgroundColor: 'green' }}
+                        onPress={() => { removeFromWatchList(id) }} 
+                    />
             }
             >
                 <Avatar source={{ uri: img }} containerStyle={styles.avatar} />
