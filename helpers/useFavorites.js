@@ -26,17 +26,6 @@ const useFavorites = (anime) => {
     }
 
 
-
-    const removeFromFavorite = (id) => {
-        LocalStorage.getObject('favorites').then((data) => {
-            console.log(data);
-            let newData = data.filter((item) => item.id !== id);
-            LocalStorage.setObject('favorites', newData);
-            ToastAndroid.show('Removed from Favorites', ToastAndroid.SHORT);
-            setShowAddBtn(true);
-        });
-    }
-
     const addToFav = () => {
         addToFavorites(anime);
     }
@@ -45,9 +34,15 @@ const useFavorites = (anime) => {
      * remove from favorites
      * @param {Function} setFn - set function to update state of favorites list
      */
-    const removeFromFav = (setFn = console.log) => {
-        removeFromFavorite(anime.id)
-        setAnimeList(setFn)
+    const removeFromFav = (setFn = console.log) => {   
+        LocalStorage.getObject('favorites').then((data) => {
+            console.log(data);
+            let newData = data.filter((item) => item.id !== anime.id);
+            LocalStorage.setObject('favorites', newData);
+            setFn(newData);
+            ToastAndroid.show(`Removed from Favorites : ${anime.title}`, ToastAndroid.SHORT);
+            setShowAddBtn(true);
+        });
     }
 
     const setAnimeList = (setfunc) => {
