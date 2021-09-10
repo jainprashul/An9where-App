@@ -38,25 +38,25 @@ const Search = ({ navigation }) => {
     }, [query])
 
     const SearchList = () => {
-        return loading ? 
+        return loading ?
             <Loading /> : <FlatList
-            data={results}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => {
-                const { img, title, synopsis, id } = item;
-                let summary = synopsis.replace('Plot Summary: ', '').substring(0, 120) + '...';
-                return (
-                    <ListItem bottomDivider onPress={(e) => {
-                        navigation.push('AnimeDetail', item)
-                    }}>
-                        <Avatar source={{ uri: img }} containerStyle={styles.avatar} />
-                        <ListItem.Content>
-                            <ListItem.Title>{title}</ListItem.Title>
-                            <ListItem.Subtitle>{summary}</ListItem.Subtitle>
-                        </ListItem.Content>
-                    </ListItem>
-                )
-            }}/>
+                data={results}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => {
+                    const { img, title, synopsis, id } = item;
+                    let summary = synopsis.replace('Plot Summary: ', '').substring(0, 120) + '...';
+                    return (
+                        <ListItem bottomDivider onPress={(e) => {
+                            navigation.push('AnimeDetail', item)
+                        }}>
+                            <Avatar source={{ uri: img }} containerStyle={styles.avatar} />
+                            <ListItem.Content>
+                                <ListItem.Title>{title}</ListItem.Title>
+                                <ListItem.Subtitle>{summary}</ListItem.Subtitle>
+                            </ListItem.Content>
+                        </ListItem>
+                    )
+                }} />
     }
 
     return (
@@ -69,9 +69,7 @@ const Search = ({ navigation }) => {
                 round={true}
                 lightTheme={true}
             />
-
             <SearchList />
-
         </View>
     )
 }

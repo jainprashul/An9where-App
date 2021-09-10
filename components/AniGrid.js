@@ -65,7 +65,6 @@ const styles = StyleSheet.create({
     },
     header: {
         justifyContent: 'center',
-
         alignItems: 'center',
         borderColor: '#ccc',
         borderWidth: 1,
@@ -73,7 +72,6 @@ const styles = StyleSheet.create({
         width: ScreenWidth,
         backgroundColor: '#3399FF',
         // tintColor: '#fff',
-
     },
 
     ListHeaderText: {

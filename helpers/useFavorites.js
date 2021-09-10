@@ -41,9 +41,13 @@ const useFavorites = (anime) => {
         addToFavorites(anime);
     }
 
-    const removeFromFav = (func = console.log) => {
+    /**
+     * remove from favorites
+     * @param {Function} setFn - set function to update state of favorites list
+     */
+    const removeFromFav = (setFn = console.log) => {
         removeFromFavorite(anime.id)
-        setAnimeList(func)
+        setAnimeList(setFn)
     }
 
     const setAnimeList = (setfunc) => {
