@@ -15,7 +15,7 @@ import AnimatedLottieView from 'lottie-react-native';
 import useFullscreen from '../helpers/useFullscreen';
 
 const Episode = ({ route, navigation }) => {
-  const { currentPlaying, anime, playedEpisodes = [] } = route.params;
+  const { currentPlaying, anime, playedEpisodes = [], setPlayEps } = route.params;
   const { episodes, id: oldID, title, synopsis, img, totalEpisodes } = anime;
 
   const epsList = episodes?.length ? episodes : Array.from(Array(totalEpisodes).keys());
@@ -30,8 +30,6 @@ const Episode = ({ route, navigation }) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [scrollLock, setScrollLock] = useState(false)
   const { addToFav, showAddBtn } = useFavorites(anime)
-
-  const {backButtonHandle} = useFullscreen({scrollLock, setScrollLock})
 
   const refIcon = React.useRef(null);
 
@@ -91,13 +89,13 @@ const Episode = ({ route, navigation }) => {
       currentTime: player?.currentTime || 0,
       progress: player ? (player.currentTime / player.duration) * 100 : 0
     }
-    !player && console.log('Saving', state);
+    // !player && console.log('Saving', state);
     LocalStorage.getObject('watching').then((data) => {
-      console.log('locaal',data);
+      // console.log('locaal',data);
       let watchList = data ? data : {};
       watchList[state.id] = state;
 
-      console.log('updaye', watchList);
+      // console.log('updaye', watchList);
       LocalStorage.setObject('watching', watchList);
     })
     
@@ -108,11 +106,12 @@ const Episode = ({ route, navigation }) => {
       title: `Episode ${episodeNo} - ${title}`
     })
     getEpisodes();
-    const backButton = backButtonHandle();
+    // const backButton = backButtonHandle();
     return () => {
       setVideoLink({});
       setLink('');
-      backButton.remove();
+      setPlayEps(episodeNo);
+      // backButton.remove();
       console.log('Unmounting EPS');
     }
     

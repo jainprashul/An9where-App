@@ -3,6 +3,8 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import SystemNavigationBar from 'react-native-system-navigation-bar'
 import { BackHandler } from 'react-native';
 
+let fullScreenStat = false // this is a global variable that will be used to check if the screen is in fullscreen mode
+
 /**
  *  useFullscreen - useFullscreen() is a react hook that will set the screen orientation to landscape and lock the screen orientation. 
  *  This is useful for fullscreen apps.
@@ -15,8 +17,13 @@ const useFullscreen = (scroll) => {
 
     const backButtonHandle = () => {
         const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            if (fullScreen) {
-                onFullScreen()
+            // console.log('back button pressed', fullScreen, fukk); 
+            if (fullScreenStat) {
+                // console.log('back button pressed on full');
+                fullScreenStat = fullScreen
+                const orientation = ScreenOrientation.OrientationLock.PORTRAIT;
+                ScreenOrientation.lockAsync(orientation);
+            setFullScreen(false);
                 return true;
             }
             return false;
@@ -32,25 +39,23 @@ const useFullscreen = (scroll) => {
      * @returns {void}
      */
     const onFullScreen = () => {
-        setFullScreen(!fullScreen);
-        setScrollLock(!scrollLock);
-        if (fullScreen) {
-
-            const orientation = ScreenOrientation.OrientationLock.PORTRAIT;
+        // console.log('FullScreen before', fullScreen);
+        let full = !fullScreen;
+        fullScreenStat = full;
+        if (full) {
+            const orientation = ScreenOrientation.OrientationLock.LANDSCAPE;
             ScreenOrientation.lockAsync(orientation);
             const s = SystemNavigationBar.navigationHide();
-            console.log(s);
             // video.current.presentFullscreenPlayer();
         } else {
-            const orientation = ScreenOrientation.OrientationLock.LANDSCAPE;
-            // ScreenOrientation.unlockAsync();
+            const orientation = ScreenOrientation.OrientationLock.PORTRAIT;
             ScreenOrientation.lockAsync(orientation);
             let s = SystemNavigationBar.navigationShow();
-            console.log(s);
-
             // video.current.dismissFullscreenPlayer();
         }
-        console.log('FullScreen', fullScreen);
+        // console.log('FullScreen after', full);
+        setScrollLock(!scrollLock);
+        setFullScreen(full);
     }
 
     return ({

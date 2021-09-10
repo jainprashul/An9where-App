@@ -1,34 +1,34 @@
 import { Video } from 'expo-av'
 import React, { useEffect, useRef, useState } from 'react'
-import { BackHandler, StatusBar, StyleSheet, Text, ToastAndroid, TouchableNativeFeedback, View } from 'react-native'  
+import { BackHandler, StatusBar, StyleSheet, Text, ToastAndroid, TouchableNativeFeedback, TouchableWithoutFeedback, View } from 'react-native'
 import { ScreenHeight, ScreenWidth } from 'react-native-elements/dist/helpers'
 import { API } from '../helpers/Const'
 import Loading from '../components/Loading'
 import { getFromApi } from '../helpers/hooks';
 import { Ionicons } from '@expo/vector-icons'
 import Slider from '@react-native-community/slider'
-import { BottomSheet, ListItem } from 'react-native-elements'
 import useFullscreen from '../helpers/useFullscreen'
+import VideoOptions from './VideoOptions'
 
 
 
-let qualities = ['HDP', 'SDP', '360P', '480P', '720P', '1080P']
+
 const VideoPlayer = ({ link, videoQ, scroll }) => {
 
     const video = useRef(null)
-    const [videoLinks, setVideoLinks] = useState(videoQ);
-    const [rate, setRate] = useState(1);
+    const [videoLinks, setVideoLinks] = useState({});
+    // const [rate, setRate] = useState(0);
     const [optionVisible, setOptionVisible] = useState(false)
     const [src, setSrc] = useState('')
     const [paused, setPaused] = useState(false)
     const [overlay, setOverlay] = useState(false)
 
-    const { fullScreen, onFullScreen , setFullScreen, backButtonHandle } = useFullscreen(scroll)
 
+    const { fullScreen, onFullScreen, setFullScreen, backButtonHandle } = useFullscreen(scroll)
     const [status, setStatus] = useState({
         positionMillis: 0,
         durationMillis: 100,
-    }); 
+    });
     let sliderValue = (status.positionMillis / status.durationMillis) || 0;
     const [loading, setLoading] = useState(false)
 
@@ -37,27 +37,28 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
     useEffect(() => {
         console.log("Link: ", link);
         setLoading(true)
-        
+
         getFromApi(API.videoLink(link)).then((data) => {
             let videoLink = {
-                hd: data.iframeUrl[0].url,
-                sd: data.iframeUrl[1].url,
+                HD: data.iframeUrl[0].url,
+                SD: data.iframeUrl[1].url,
             }
             console.log(videoLink);
             setVideoLinks(videoLink);
-            setSrc(videoLink.sd)
+            console.log(src);
+            setSrc(videoLink.SD)
             setLoading(false)
         })
         console.log('Player loaded');
         StatusBar.setHidden(true);
-        
+        const backHandler = backButtonHandle()
 
 
         return () => {
             // setLoading(true)
             console.log('Player unmounted');
             StatusBar.setHidden(false);
-            // backHandler.remove();
+            backHandler.remove();
         }
     }, [link, videoQ])
 
@@ -103,7 +104,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
         clearTimeout(overlayTimer)
         overlayTimer = setTimeout(() => {
             setOverlay(false)
-        }, OVERLAY_SCREEN_TIME )
+        }, OVERLAY_SCREEN_TIME)
     }
 
     /**
@@ -118,7 +119,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
         clearTimeout(overlayTimer)
         overlayTimer = setTimeout(() => {
             setOverlay(false)
-        }, OVERLAY_SCREEN_TIME )
+        }, OVERLAY_SCREEN_TIME)
     }
 
     /**
@@ -137,7 +138,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
             console.log('single tap LEFT');
             overlayTimer = setTimeout(() => {
                 setOverlay(false)
-            }, OVERLAY_SCREEN_TIME )
+            }, OVERLAY_SCREEN_TIME)
         }
 
         handleDoubleTap(doubleTap, singleTap)
@@ -155,7 +156,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
             console.log('single tap RIGHT');
             overlayTimer = setTimeout(() => {
                 setOverlay(false)
-            }, OVERLAY_SCREEN_TIME )
+            }, OVERLAY_SCREEN_TIME)
         }
 
         handleDoubleTap(doubleTap, singleTap)
@@ -168,26 +169,26 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
         clearTimeout(overlayTimer)
         overlayTimer = setTimeout(() => {
             setOverlay(false)
-        }, OVERLAY_SCREEN_TIME )
+        }, OVERLAY_SCREEN_TIME)
     }
 
-    const handleOption = (e) => {
-        // console.log(e);
+    const optionToggle = () => {
         setOptionVisible(!optionVisible)
     }
 
 
+
     return (
-        <View style={fullScreen ? styles.fullScreenVideo : styles.video }>
+        <View style={fullScreen ? styles.fullScreenVideo : styles.video}>
             {loading ? <Loading /> :
                 <Video
                     ref={video}
-                    style={{ ...StyleSheet.absoluteFillObject}}
+                    style={{ ...StyleSheet.absoluteFillObject }}
                     source={{
                         uri: src,
                     }}
-            
-                    rate={rate}
+
+                    // rate={rate}
                     // onFullscreenUpdate={onFullscreenUpdate}
                     resizeMode="contain"
                     shouldPlay={true}
@@ -215,7 +216,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
                         <View style={styles.timer}>
                             <Text style={{ color: 'white' }} >{getTimeFromMillis(status.positionMillis)}</Text>
                             <Text style={{ color: 'white' }}>{getTimeFromMillis(status.durationMillis)}
-                                <Ionicons name={fullScreen ? 'contract' : 'expand'} onPress={onFullScreen} style={{ color: 'white', fontSize: 25,padding  : 10 , margin : 10}} />
+                                <Ionicons name={fullScreen ? 'contract' : 'expand'} onPress={onFullScreen} style={{ color: 'white', fontSize: 25, padding: 10, margin: 10 }} />
                             </Text>
                         </View>
                         <Slider
@@ -229,7 +230,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
 
                     <View style={styles.optionContainer}>
                         <View style={styles.option}>
-                            <Ionicons name='ellipsis-vertical' style={{ color: 'white', fontSize: 25, padding: 5 , margin  : 10}} onPress={handleOption} />
+                            <Ionicons name='ellipsis-vertical' style={{ color: 'white', fontSize: 25, padding: 5, margin: 10 }} onPress={optionToggle} />
                         </View>
 
 
@@ -240,25 +241,8 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
                         <TouchableNativeFeedback onPress={() => youtubeSeekRight()}><View style={{ flex: 1 }}></View></TouchableNativeFeedback>
                     </View>
                 }
-                {/* <BottomSheet
-                    isVisible={optionVisible}
-                    containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
-                    
-                >
-                    <TouchableWithoutFeedback onPress={(e) => {
-                        setOptionVisible(false)
-                    }}> 
-
-
-                        <ListItem containerStyle={styles.list} bottomDivider >
-                            <Ionicons name='speedometer' style={{}} />
-                            <ListItem.Content>
-                                <ListItem.Title style={styles.ListItem}>Rate : {status.rate}</ListItem.Title>
-                            </ListItem.Content>
-                        </ListItem>
-                    </TouchableWithoutFeedback>
-
-                </BottomSheet> */}
+            
+                <VideoOptions video={{ref : video.current , videoLinks , setSrc, status}} visible={optionVisible} toggle={optionToggle} />
 
             </View>
         </View>
@@ -281,11 +265,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         // ...StyleSheet.absoluteFill,
         elevation: 10,
-        
+
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        
+
         // backgroundColor: 'rgba(0,0,0,0.5)',
     },
     overlaySet: {

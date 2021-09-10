@@ -58,7 +58,7 @@ const AnimeDetail = ({ route, navigation }) => {
                     <Button title={playEps ? `Play Episode-${playEps}` : `Watch Now`}
                         icon={<Ionicons name="play" size={20} color="white" />}
                         raised containerStyle={{ ...styles.watchBtn, margin: 10}} buttonStyle={styles.watchBtn}
-                        onPress={() => navigation.navigate('Episode', { anime: route.params, playedEpisodes, currentPlaying: playEps ? playEps : 1 })} />
+                        onPress={() => navigation.navigate('Episode', { anime: route.params, playedEpisodes, currentPlaying: playEps ? playEps : 1 , setPlayEps})} />
                     <FavIcon />
                     </View>
                 

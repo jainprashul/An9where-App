@@ -42,7 +42,8 @@ const Genre = ({ navigation, route }) => {
     const GenreList = () =>{ 
         return(
         <FlatList
-            data={GENRE}
+                data={GENRE}
+                keyExtractor={(item, index) => item.genre}
             renderItem={({ item }) => (
                 <ListItem bottomDivider onPress={ ()=>{
                     setAnimes([]);
@@ -67,7 +68,11 @@ const Genre = ({ navigation, route }) => {
     return (
         <View style={styles.home}>
             {/* <Button title="Go to Favorites" onPress={} />  */}
-            <BottomSheet isVisible={visible} containerStyle={styles.bottomSheet}> 
+            <BottomSheet isVisible={visible}
+                modalProps={{
+                    onRequestClose: () => setVisible(false),
+                }}
+                containerStyle={styles.bottomSheet}>
             
             <ListItem bottomDivider
                 containerStyle={{backgroundColor:"red"}}
