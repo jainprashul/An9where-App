@@ -13,6 +13,7 @@ import Genre from './screens/Genre';
 import Search from './components/Search';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+
  
 const Stack = createNativeStackNavigator();
 

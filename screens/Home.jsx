@@ -12,10 +12,9 @@ import { API } from '../helpers/Const';
 import { getFromApi } from '../helpers/hooks';
 import LocalStorage from '../helpers/LocalStorage';
 import * as Analytics from 'expo-firebase-analytics';
+import * as FacebookAds from 'expo-ads-facebook';
 
 const Home = ({ navigation, route }) => {
-
-  console.log(route);
 
   const [Popular, setPopular] = useState([]);
   const [Ongoing, setOngoing] = useState([]);
@@ -68,6 +67,12 @@ const Home = ({ navigation, route }) => {
       screen_path: 'Home',
     });
     console.log('Data Fetched');
+
+    FacebookAds.InterstitialAdManager.showAd('1056426911773868_1056441078439118')
+      .then(didClick => { })
+      .catch(error => { });
+
+
   }, []);
 
   return (

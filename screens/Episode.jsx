@@ -14,6 +14,7 @@ import useFavorites from '../helpers/useFavorites';
 import AnimatedLottieView from 'lottie-react-native';
 import useFullscreen from '../helpers/useFullscreen';
 import * as Analytics from 'expo-firebase-analytics';
+import * as FacebookAds from 'expo-ads-facebook';
 
 const Episode = ({ route, navigation }) => {
   const { currentPlaying, anime, playedEpisodes = [], setPlayEps } = route.params;
@@ -117,6 +118,7 @@ const Episode = ({ route, navigation }) => {
       title: `Episode ${episodeNo} - ${title}`
     })
     getEpisodes();
+
     Analytics.setCurrentScreen('Episode' + title + '-EP-' + episodeNo);
     Analytics.logEvent('Episode' + title + '-EP-' + episodeNo + '-View', {
       episodeNo,
@@ -125,6 +127,9 @@ const Episode = ({ route, navigation }) => {
       totalEpisodes,
       playedEpisodes,
     });
+    FacebookAds.InterstitialAdManager.showAd('1056426911773868_1056441078439118')
+      .then(didClick => { })
+      .catch(error => { });
     // const backButton = backButtonHandle();
     return () => {
       clearAll();

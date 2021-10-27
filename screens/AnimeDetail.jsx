@@ -8,11 +8,12 @@ import useFavorites from '../helpers/useFavorites'
 import LottieView from 'lottie-react-native'
 import { Ionicons } from '@expo/vector-icons'
 import * as Analytics from 'expo-firebase-analytics';
+import * as FacebookAds from 'expo-ads-facebook';
 
 
 const AnimeDetail = ({ route, navigation }) => {
 
-    console.log(route);
+
 
     const { id, title, synopsis, img, genres, status, otherName, released, totalEpisodes, episodes } = route.params
     const [playEps, setPlayEps] = React.useState(null) // episode to play
@@ -44,7 +45,8 @@ const AnimeDetail = ({ route, navigation }) => {
             isFavorite: isFavorite,
             
         }),
-        Analytics.setCurrentScreen(`Anime_Detail_Screen_${title}`);
+            Analytics.setCurrentScreen(`Anime_Detail_Screen_${title}`);
+        
         
     }, [title, playEps])
 

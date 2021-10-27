@@ -31,6 +31,9 @@
     "web": {
       "favicon": "./assets/favicon.png"
       
-    }
+    },
+    "facebookAppId": "1056426911773868",
+    "facebookDisplayName" : "An9where"
+    
   }
 }
