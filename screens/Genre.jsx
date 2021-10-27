@@ -5,6 +5,7 @@ import { BottomSheet, Icon, ListItem } from 'react-native-elements';
 import AniGrid from '../components/AniGrid';
 import { API, GENRE } from '../helpers/Const';
 import { getFromApi } from '../helpers/hooks';
+import * as Analytics from 'expo-firebase-analytics';
 
 const Genre = ({ navigation, route }) => {
 
@@ -21,8 +22,11 @@ const Genre = ({ navigation, route }) => {
                 <Icon name='filter' type='material-community' onPress={() => setVisible(true)} />
             ),
             headerTitle: 'Genre - ' + getGenreName(genre)
-
         })
+        Analytics.setCurrentScreen('Genre_' + genre + '_Screen');
+        Analytics.logEvent('Genre_Screen_Opened', {
+            genre: genre
+        });
     }, [genre])
 
 

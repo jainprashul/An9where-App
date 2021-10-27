@@ -11,8 +11,11 @@ import Loading from '../components/Loading';
 import { API } from '../helpers/Const';
 import { getFromApi } from '../helpers/hooks';
 import LocalStorage from '../helpers/LocalStorage';
+import * as Analytics from 'expo-firebase-analytics';
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
+
+  console.log(route);
 
   const [Popular, setPopular] = useState([]);
   const [Ongoing, setOngoing] = useState([]);
@@ -57,6 +60,13 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
     getAnime();
+    Analytics.setCurrentScreen('Home');
+    Analytics.logEvent('Home_Screen_Loaded', {
+      screen_name: 'Home',
+      screen_index: 0,
+      screen_depth: 0,
+      screen_path: 'Home',
+    });
     console.log('Data Fetched');
   }, []);
 

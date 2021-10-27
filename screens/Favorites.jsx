@@ -7,6 +7,7 @@ import AniGrid from '../components/AniGrid'
 import Loading from '../components/Loading';
 import LocalStorage from '../helpers/LocalStorage';
 import useFavorites from '../helpers/useFavorites';
+import * as Analytics from 'expo-firebase-analytics';
 
 const Favorites = ({ route, navigation }) => {
     // const { button , description , image , title} = route.params
@@ -33,7 +34,16 @@ const Favorites = ({ route, navigation }) => {
             })
             // console.log('watched', watched);
             setWatchlist(watched)
-        })
+        });
+
+        Analytics.setCurrentScreen('Favorites');
+        Analytics.logEvent('favorite_screen_opened', {
+            screen: 'Favorites',
+        });
+
+        return () => {
+            // cleanup
+        }
 
     }, [])
 

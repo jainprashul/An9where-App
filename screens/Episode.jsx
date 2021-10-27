@@ -13,6 +13,7 @@ import { ScreenWidth } from 'react-native-elements/dist/helpers';
 import useFavorites from '../helpers/useFavorites';
 import AnimatedLottieView from 'lottie-react-native';
 import useFullscreen from '../helpers/useFullscreen';
+import * as Analytics from 'expo-firebase-analytics';
 
 const Episode = ({ route, navigation }) => {
   const { currentPlaying, anime, playedEpisodes = [], setPlayEps } = route.params;
@@ -101,20 +102,36 @@ const Episode = ({ route, navigation }) => {
     
   }
 
+  const clearAll = () => {
+    setVideoLink({});
+    setVideosQuality({});
+    setVideoQ({});
+    setLink('');
+    setEpisodeNo(currentPlaying);
+    setSelectedIndex(0);
+    setScrollLock(false);
+  }
+
   useEffect(() => {
     navigation.setOptions({
       title: `Episode ${episodeNo} - ${title}`
     })
     getEpisodes();
+    Analytics.setCurrentScreen('Episode' + title + '-EP-' + episodeNo);
+    Analytics.logEvent('Episode' + title + '-EP-' + episodeNo + '-View', {
+      episodeNo,
+      title,
+      id: oldID.split('-episode-')[0].replace('/', '').trim(),
+      totalEpisodes,
+      playedEpisodes,
+    });
     // const backButton = backButtonHandle();
     return () => {
-      setVideoLink({});
-      setLink('');
+      clearAll();
       setPlayEps(episodeNo);
       // backButton.remove();
       console.log('Unmounting EPS');
-    }
-    
+    }    
   }, [episodeNo])
 
   console.log(episodeNo, videoLink);

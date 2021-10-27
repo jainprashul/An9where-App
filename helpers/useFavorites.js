@@ -61,6 +61,13 @@ const useFavorites = (anime) => {
                 }
             }
         });
+
+
+
+        return () => {
+            // cleanup
+        }
+        
     }, [anime.id])
 
     return {

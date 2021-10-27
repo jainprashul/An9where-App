@@ -7,8 +7,12 @@ import LocalStorage from '../helpers/LocalStorage'
 import useFavorites from '../helpers/useFavorites'
 import LottieView from 'lottie-react-native'
 import { Ionicons } from '@expo/vector-icons'
+import * as Analytics from 'expo-firebase-analytics';
+
 
 const AnimeDetail = ({ route, navigation }) => {
+
+    console.log(route);
 
     const { id, title, synopsis, img, genres, status, otherName, released, totalEpisodes, episodes } = route.params
     const [playEps, setPlayEps] = React.useState(null) // episode to play
@@ -31,6 +35,17 @@ const AnimeDetail = ({ route, navigation }) => {
                 }
             }
         })
+        Analytics.logEvent('Anime_Detail_Screen', {
+            screen: 'Anime_Detail_Screen',
+            anime_id: id,
+            anime_title: title,
+            anime_img: img,
+            anime_genres: genres,
+            isFavorite: isFavorite,
+            
+        }),
+        Analytics.setCurrentScreen(`Anime_Detail_Screen_${title}`);
+        
     }, [title, playEps])
 
     const FavIcon = () => (
