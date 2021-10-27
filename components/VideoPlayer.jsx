@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons'
 import Slider from '@react-native-community/slider'
 import useFullscreen from '../helpers/useFullscreen'
 import VideoOptions from './VideoOptions'
-import { deactivateKeepAwake } from 'expo-keep-awake'
+import { activateKeepAwake, deactivateKeepAwake, useKeepAwake } from 'expo-keep-awake'
 
 
 
@@ -193,6 +193,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
                     style={{ ...StyleSheet.absoluteFillObject }}
                     source={{
                         uri: src,
+                        
                     }}
 
                     // rate={rate}

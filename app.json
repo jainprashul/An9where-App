@@ -25,10 +25,12 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.xpNitro.an9where",
+      "googleServicesFile": "./google-services.json",
       "versionCode": 4
     },
     "web": {
       "favicon": "./assets/favicon.png"
+      
     }
   }
 }

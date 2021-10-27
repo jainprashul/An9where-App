@@ -10,7 +10,7 @@ const VideoOptions = ({ video, visible, toggle }) => {
     const [rateOptionToggle, setRateOptionToggle] = React.useState(false)
     const [qualityOptionToggle, setQualityOptionToggle] = React.useState(false)
 
-    const [rate, setRate] = React.useState(1.0)
+    const [rate, setRate] = React.useState(video.state.rate)
     const [quality, setQuality] = React.useState('SD')
 
     // console.log(qualityOptionToggle + 'q  r ' + rateOptionToggle)

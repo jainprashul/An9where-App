@@ -52,7 +52,7 @@ export function getFromApi(api_url) {
       })
       .catch((error) => {
           console.error(error);
-          alert("Error: " + error);
+        //   alert("Error: " + error);
         // rerun if failed to fetch
         getFromApi(api_url);
       });

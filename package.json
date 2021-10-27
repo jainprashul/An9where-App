@@ -32,7 +32,8 @@
     "react-native-video": "^5.1.1",
     "react-native-web": "^0.17.1",
     "expo-updates": "~0.8.2",
-    "expo-keep-awake": "~9.2.0"
+    "expo-keep-awake": "~9.2.0",
+    "expo-firebase-analytics": "~4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0"
