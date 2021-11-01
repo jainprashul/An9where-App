@@ -10,6 +10,7 @@ import Slider from '@react-native-community/slider'
 import useFullscreen from '../helpers/useFullscreen'
 import VideoOptions from './VideoOptions'
 import { activateKeepAwake, deactivateKeepAwake, useKeepAwake } from 'expo-keep-awake'
+import  WebView  from 'react-native-webview';
 
 
 
@@ -24,11 +25,14 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
     const [paused, setPaused] = useState(false)
     const [overlay, setOverlay] = useState(false)
 
+    const [switchtoWeb, setSwitchtoWeb] = useState(false)
 
-    const { fullScreen, onFullScreen, setFullScreen, backButtonHandle } = useFullscreen(scroll)
+
+    const { fullScreen, onFullScreen, setFullScreen, backButtonHandle, OrientationListener } = useFullscreen(scroll)
     const [status, setStatus] = useState({
         positionMillis: 0,
         durationMillis: 100,
+        rate: 1.0,
     });
     let sliderValue = (status.positionMillis / status.durationMillis) || 0;
     const [loading, setLoading] = useState(false)
@@ -38,8 +42,10 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
     useEffect(() => {
         console.log("Link: ", link);
         setLoading(true)
+        activateKeepAwake('video')
 
-        getFromApi(API.videoLink(link)).then((data) => {
+
+        fetch(API.videoLink(link)).then(res => res.json()).then(res => {
             let videoLink = {
                 HD: data.iframeUrl[0].url,
                 SD: data.iframeUrl[1].url,
@@ -48,11 +54,25 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
             setVideoLinks(videoLink);
             console.log(src);
             setSrc(videoLink.SD)
-            setLoading(false)
+            setLoading(false);
+        }).catch(err => {
+            console.log(err);
+            setSwitchtoWeb(true)
+            // onFullScreen()
+            
+
         })
+
+        // getFromApi(API.videoLink(link)).then((data) => {
+            
+        // }).catch((err) => {
+        //     console.log(err);
+        //     setLoading(false)
+        // })
         console.log('Player loaded');
         StatusBar.setHidden(true);
         const backHandler = backButtonHandle()
+        
 
 
         return () => {
@@ -60,6 +80,7 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
             console.log('Player unmounted');
             StatusBar.setHidden(false);
             backHandler.remove();
+            deactivateKeepAwake('video')
         }
     }, [link, videoQ])
 
@@ -91,10 +112,8 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
     const playPause = () => {
         if (status.isPlaying){
             video.current.pauseAsync()
-            deactivateKeepAwake('video')
         } else {
             video.current.playAsync()
-            activateKeepAwake('video')
         }
         setPaused(!paused)
     }
@@ -183,9 +202,21 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
         setOptionVisible(!optionVisible)
     }
 
+    const onNavigationStateChange = (navState) => {
+        // setStatus(navState);
+        console.log(navState);
+    }
+
+    const jsCode = 'document.querySelectorAll("iframe").setAttribute("sandbox", "allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation");'
 
 
-    return (
+
+    return switchtoWeb ? (
+        <WebView style={styles.webView} source={{ uri: link }} allowsFullscreenVideo allowsInlineMediaPlayback mediaPlaybackRequiresUserAction={false}
+            thirdPartyCookiesEnabled={false}
+            onNavigationStateChange={onNavigationStateChange}
+ />
+    ) : (
         <View style={fullScreen ? styles.fullScreenVideo : styles.video}>
             {loading ? <Loading /> :
                 <Video
@@ -259,6 +290,20 @@ const VideoPlayer = ({ link, videoQ, scroll }) => {
 
 
 const styles = StyleSheet.create({
+    webView: {
+        flex: 1,
+        backgroundColor: 'black',
+        width: ScreenWidth,
+        height: ScreenWidth * 3 / 4
+    },
+
+    webViewFull: {
+        flex: 1,
+        backgroundColor: 'black',
+        width: ScreenHeight - 20,
+        height: ScreenWidth,
+        elevation: 10,
+    },
     video: {
         width: ScreenWidth,
         height: ScreenWidth * 0.5625,

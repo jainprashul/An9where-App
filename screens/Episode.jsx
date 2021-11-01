@@ -62,6 +62,8 @@ const Episode = ({ route, navigation }) => {
         let videoLinks = {
           sub: sub.servers[1] ? sub.servers[1]["iframe"] : null,
           dub: dub.servers[1] ? dub.servers[1]['iframe'] : null,
+          subOthers: sub.servers.length ? sub.servers :[],
+          dubOthers: dub.servers.length ? dub.servers :[]
         }
         setVideoLink(videoLinks)
 
